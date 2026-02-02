@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Power Up 3 单元词汇听写</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; /* iPad点击高亮去除 */
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.2em;
+        }
+
+        .day-selector {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        select {
+            padding: 10px 20px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            border: 2px solid #667eea;
+            color: #2d3748;
+            outline: none;
+            cursor: pointer;
+            background: white;
+            font-weight: bold;
+            max-width: 100%;
+            -webkit-appearance: none; /* iPad样式优化 */
+        }
+
+        .settings-row {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px dashed #cbd5e0;
+        }
+
+        .setting-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .setting-group label {
+            color: #4a5568;
+            font-weight: 600;
+        }
+
+        .setting-group select {
+            padding: 8px 12px;
+            font-size: 1rem;
+            border: 1px solid #667eea;
+            background: white;
+        }
+
+        .status {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 5px 10px;
+        }
+
+        .label {
+            color: #718096;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .value {
+            color: #2d3748;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .progress {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 30px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .current-word {
+            text-align: center;
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #2d3748;
+            margin: 40px 0;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.2;
+        }
+
+        .starting {
+            text-align: center;
+            font-size: 1.5em;
+            color: #667eea;
+            margin: 40px 0;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .controls {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin: 5px;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+            -webkit-appearance: none; /* iPad按钮样式修正 */
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        button:active {
+            transform: translateY(1px); /* 触摸反馈 */
+        }
+
+        button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .answers {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .answers h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .answer-list {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* iPad滚动优化 */
+        }
+
+        .answer-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .answer-left {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .answer-number {
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 15px;
+            min-width: 30px;
+        }
+
+        .answer-text {
+            color: #2d3748;
+            font-size: 1.2em;
+            font-weight: 500;
+        }
+
+        .answer-meaning {
+            color: #718096;
+            font-size: 1em;
+            text-align: right;
+            margin-left: 10px;
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎧 Power Up 3 单元词汇听写</h1>
+
+        <div class="day-selector">
+            <select id="daySelect" onchange="loadDay()"></select>
+        </div>
+
+        <div class="settings-row">
+            <div class="setting-group">
+                <label>每词朗读:</label>
+                <select id="repeatCount">
+                    <option value="1">1次</option>
+                    <option value="2">2次</option>
+                    <option value="3" selected>3次</option>
+                </select>
+            </div>
+            <div class="setting-group">
+                <label>写字时长:</label>
+                <select id="waitTime">
+                    <option value="5">5秒</option>
+                    <option value="8">8秒</option>
+                    <option value="10" selected>10秒</option>
+                    <option value="12">12秒</option>
+                    <option value="15">15秒</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="status">
+            <div class="status-item">
+                <span class="label">本组词数</span>
+                <span class="value" id="totalCount">0</span>
+            </div>
+            <div class="status-item">
+                <span class="label">当前进度</span>
+                <span class="value" id="currentProgress">0 / 0</span>
+            </div>
+        </div>
+
+        <div class="progress">
+            <div class="progress-bar" id="progressBar">0%</div>
+        </div>
+
+        <div class="current-word" id="currentWord" style="display: none;"></div>
+        <div class="starting" id="starting">准备开始...</div>
+
+        <div class="controls">
+            <button id="startBtn" onclick="startDictation()">开始听写</button>
+            <button id="pauseBtn" onclick="pauseDictation()" style="display: none;" disabled>暂停</button>
+            <button id="resumeBtn" onclick="resumeDictation()" style="display: none;">继续</button>
+            <button id="restartBtn" onclick="resetDictation()" style="display: none; background: #e53e3e;">重置</button>
+        </div>
+
+        <div class="answers" id="answers">
+            <h2>📝 听写答案</h2>
+            <div class="answer-list" id="answerList"></div>
+        </div>
+    </div>
+
+    <script>
+        // 词汇数据 (基于 PU3 指引单整理)
+        const wordData = {
+            "Unit 1 词汇 1": [
+                { "text": "in Russia", "meaning": "在俄罗斯" },
+                { "text": "talk about meals", "meaning": "谈论食物" },
+                { "text": "meal times", "meaning": "用餐时间" },
+                { "text": "half past twelve", "meaning": "12点半" },
+                { "text": "seven o'clock", "meaning": "7点钟" },
+                { "text": "midnight", "meaning": "午夜" },
+                { "text": "half past six", "meaning": "6点半" },
+                { "text": "half past eight", "meaning": "8点半" },
+                { "text": "eight o'clock", "meaning": "8点钟" },
+                { "text": "half past nine", "meaning": "9点半" },
+                { "text": "midday", "meaning": "正午" },
+                { "text": "What time is it?", "meaning": "现在几点?" },
+                { "text": "It's half past twelve.", "meaning": "现在是12点半。" },
+                { "text": "breakfast", "meaning": "早餐" },
+                { "text": "a snack", "meaning": "一顿小吃" },
+                { "text": "lunch", "meaning": "午餐" },
+                { "text": "dinner", "meaning": "晚餐" },
+                { "text": "wake up", "meaning": "起床" },
+                { "text": "go to bed", "meaning": "去睡觉" }
+            ],
+            "Unit 1 词汇 2": [
+                { "text": "catch", "meaning": "抓住" },
+                { "text": "hop", "meaning": "单脚跳" },
+                { "text": "skip", "meaning": "跳绳" },
+                { "text": "dance", "meaning": "跳舞" },
+                { "text": "jump to your places", "meaning": "跳到你的位置" },
+                { "text": "practice time", "meaning": "练习时间" },
+                { "text": "Are you in or out?", "meaning": "你是加入还是退出?" },
+                { "text": "be quiet", "meaning": "保持安静" },
+                { "text": "mustn't shout", "meaning": "禁止大叫" },
+                { "text": "don't laugh", "meaning": "不要笑" },
+                { "text": "with a smile on your face", "meaning": "面带微笑" },
+                { "text": "hold her legs", "meaning": "抓住她的腿" },
+                { "text": "fall into the net", "meaning": "落入网中" },
+                { "text": "dress up", "meaning": "打扮" },
+                { "text": "jump", "meaning": "跳" },
+                { "text": "climb", "meaning": "攀登" }
+            ],
+            "Unit 2 词汇 1": [
+                { "text": "in China", "meaning": "在中国" },
+                { "text": "in the supermarket", "meaning": "在超市里" },
+                { "text": "shop for food", "meaning": "买食物" },
+                { "text": "tea", "meaning": "茶" },
+                { "text": "cup", "meaning": "杯" },
+                { "text": "coffee", "meaning": "咖啡" },
+                { "text": "milkshake", "meaning": "奶昔" },
+                { "text": "glass", "meaning": "杯" },
+                { "text": "cereal", "meaning": "谷物食物" },
+                { "text": "sauce", "meaning": "酱" },
+                { "text": "pancake", "meaning": "薄煎饼" },
+                { "text": "noodles", "meaning": "面条" },
+                { "text": "strawberries", "meaning": "草莓" },
+                { "text": "yogurt", "meaning": "酸奶" },
+                { "text": "a glass of milkshake", "meaning": "一杯牛奶" },
+                { "text": "a cup of coffee", "meaning": "一杯咖啡" },
+                { "text": "a bottle of chocolate sauce", "meaning": "一瓶巧克力酱" },
+                { "text": "a bowl of cereal", "meaning": "一碗谷物食物" }
+            ],
+            "Unit 2 词汇 2": [
+                { "text": "drove (drive) to town", "meaning": "开车去城镇" },
+                { "text": "the place where May grew (grow) up", "meaning": "May 长大的地方" },
+                { "text": "the teacher who taught (teach) her", "meaning": "教过她的老师" },
+                { "text": "got (get) dressed up", "meaning": "穿衣打扮" },
+                { "text": "took (take) some photos", "meaning": "拍一些照片" },
+                { "text": "gave (give)", "meaning": "给" },
+                { "text": "climbed (climb)", "meaning": "攀登" },
+                { "text": "wrote (write) this song", "meaning": "写这首歌" }
+            ],
+            "Unit 3 词汇 1": [
+                { "text": "do exercise", "meaning": "做训练" },
+                { "text": "on the beach", "meaning": "在海滩上" },
+                { "text": "bandage", "meaning": "绷带" },
+                { "text": "knee", "meaning": "膝盖" },
+                { "text": "stomach", "meaning": "胃" },
+                { "text": "shoulder", "meaning": "肩膀" },
+                { "text": "neck", "meaning": "脖子" },
+                { "text": "toe", "meaning": "脚趾" },
+                { "text": "finger", "meaning": "手指" },
+                { "text": "elbow", "meaning": "肘部" },
+                { "text": "back", "meaning": "背部" }
+            ],
+            "Unit 3 词汇 2": [
+                { "text": "is/am/are sick", "meaning": "生病了" },
+                { "text": "is/am/are ill", "meaning": "不舒服" },
+                { "text": "be quick", "meaning": "快点" },
+                { "text": "What's the problem?", "meaning": "什么问题?" },
+                { "text": "What's the matter?", "meaning": "怎么了?" },
+                { "text": "have/has got a cough", "meaning": "咳嗽" },
+                { "text": "have/has got a temperature", "meaning": "发烧" },
+                { "text": "have/has got sore throat", "meaning": "喉咙痛" },
+                { "text": "have/has got a cold", "meaning": "感冒" },
+                { "text": "have/has got a backache", "meaning": "背痛" },
+                { "text": "My stomach hurts.", "meaning": "我的胃痛。" }
+            ],
+            "Unit 4 词汇 1": [
+                { "text": "in India", "meaning": "在印度" },
+                { "text": "star", "meaning": "星星" },
+                { "text": "jungle", "meaning": "丛林" },
+                { "text": "world", "meaning": "世界" },
+                { "text": "waterfall", "meaning": "瀑布" },
+                { "text": "moon", "meaning": "月亮" },
+                { "text": "sky", "meaning": "天空" },
+                { "text": "plant", "meaning": "植物" },
+                { "text": "wave", "meaning": "海浪" },
+                { "text": "island", "meaning": "岛" }
+            ],
+            "Unit 4 词汇 2": [
+                { "text": "drove (drive) to the beach", "meaning": "开车去海滩" },
+                { "text": "sailed (sail) on the sea", "meaning": "在海上航行" },
+                { "text": "threw (throw) our nets", "meaning": "扔我们的网" },
+                { "text": "caught (catch) some fish", "meaning": "抓些鱼" },
+                { "text": "bounced (bounce)", "meaning": "弹跳" },
+                { "text": "hopped (hop)", "meaning": "单脚跳行" },
+                { "text": "skipped (skip)", "meaning": "跳绳" },
+                { "text": "kicked (kick)", "meaning": "踢" }
+            ],
+            "Unit 5 词汇 1": [
+                { "text": "in Greece", "meaning": "在希腊" },
+                { "text": "wing", "meaning": "翅膀" },
+                { "text": "striped", "meaning": "有条纹的" },
+                { "text": "spotted", "meaning": "有斑点的" },
+                { "text": "silver", "meaning": "银色的" },
+                { "text": "bright", "meaning": "明亮的" },
+                { "text": "gold", "meaning": "金色的" },
+                { "text": "light", "meaning": "淡色的" },
+                { "text": "dark", "meaning": "暗色的" }
+            ],
+            "Unit 5 词汇 2": [
+                { "text": "make all day long", "meaning": "做一整天" },
+                { "text": "plastic", "meaning": "塑料" },
+                { "text": "wool", "meaning": "羊毛" },
+                { "text": "wood", "meaning": "木材" },
+                { "text": "cut them up", "meaning": "把他们剪碎" },
+                { "text": "cut them out", "meaning": "切出来" },
+                { "text": "glue", "meaning": "胶水" },
+                { "text": "These scissors are made of metal.", "meaning": "这剪刀是金属做的。" },
+                { "text": "This scarf is made of wool.", "meaning": "这条围巾是羊毛做的。" },
+                { "text": "My box is made of plastic.", "meaning": "我的盒子是塑料做的。" },
+                { "text": "My table's made of wood.", "meaning": "我的桌子是木头做的。" },
+                { "text": "That crown is made of brown card.", "meaning": "王冠是用棕色卡片做的。" },
+                { "text": "silver wings", "meaning": "银色的翅膀" }
+            ],
+            "Unit 6 词汇 1": [
+                { "text": "in Turkey", "meaning": "在土耳其" },
+                { "text": "geography", "meaning": "地理" },
+                { "text": "history", "meaning": "历史" },
+                { "text": "sports", "meaning": "运动" },
+                { "text": "maths", "meaning": "数学" },
+                { "text": "language", "meaning": "语言" },
+                { "text": "music", "meaning": "音乐" },
+                { "text": "science", "meaning": "科学" },
+                { "text": "IT", "meaning": "信息技术" },
+                { "text": "art", "meaning": "美术" }
+            ],
+            "Unit 6 词汇 2": [
+                { "text": "laptop", "meaning": "笔记本电脑" },
+                { "text": "apps", "meaning": "应用软件" },
+                { "text": "an e-book", "meaning": "一本电子书" },
+                { "text": "a special rucksack", "meaning": "一个特殊的帆布背包" },
+                { "text": "an online dictionary", "meaning": "一本在线词典" },
+                { "text": "bin", "meaning": "箱子" },
+                { "text": "Internet", "meaning": "互联网" },
+                { "text": "find safe websites", "meaning": "查找安全网站" },
+                { "text": "paste a photo or two", "meaning": "粘贴两张照片" },
+                { "text": "scissors", "meaning": "剪刀" },
+                { "text": "glue", "meaning": "胶" }
+            ],
+            "Unit 7 词汇 1": [
+                { "text": "in Spain", "meaning": "在西班牙" },
+                { "text": "actor", "meaning": "演员" },
+                { "text": "waiter", "meaning": "服务员" },
+                { "text": "cook", "meaning": "厨师" },
+                { "text": "driver", "meaning": "驾驶员" },
+                { "text": "journalist", "meaning": "记者" },
+                { "text": "photographer", "meaning": "摄影师" },
+                { "text": "artist", "meaning": "艺术家" },
+                { "text": "designer", "meaning": "设计师" },
+                { "text": "singer", "meaning": "歌手" },
+                { "text": "acrobat", "meaning": "杂技演员" }
+            ],
+            "Unit 7 词汇 2": [
+                { "text": "What's he like?", "meaning": "他是什么样子的?" },
+                { "text": "interesting", "meaning": "有趣的" },
+                { "text": "kind", "meaning": "友善的" },
+                { "text": "friendly", "meaning": "友好的" },
+                { "text": "clever", "meaning": "聪明的" },
+                { "text": "lazy", "meaning": "懒惰的" },
+                { "text": "lovely", "meaning": "可爱的" },
+                { "text": "unkind", "meaning": "不友善" },
+                { "text": "unfriendly", "meaning": "不友好" },
+                { "text": "popular", "meaning": "欢迎" },
+                { "text": "brave", "meaning": "勇敢的" }
+            ],
+            "Unit 8 词汇 1": [
+                { "text": "city break", "meaning": "城市休息" },
+                { "text": "in the USA", "meaning": "在美国" },
+                { "text": "They're lost.", "meaning": "他们迷路了" },
+                { "text": "north", "meaning": "北" },
+                { "text": "east", "meaning": "东" },
+                { "text": "south", "meaning": "南" },
+                { "text": "west", "meaning": "西" },
+                { "text": "left", "meaning": "左" },
+                { "text": "right", "meaning": "右" },
+                { "text": "straight on", "meaning": "一直向前" },
+                { "text": "on road 95", "meaning": "在95号公路上" },
+                { "text": "get to road 9", "meaning": "到达9号公路" }
+            ],
+            "Unit 8 词汇 2": [
+                { "text": "airport", "meaning": "机场" },
+                { "text": "buildings", "meaning": "建筑物" },
+                { "text": "banks", "meaning": "银行" },
+                { "text": "money", "meaning": "钱" },
+                { "text": "post office", "meaning": "邮局" },
+                { "text": "buy some stamps", "meaning": "买一些邮票" },
+                { "text": "chemist", "meaning": "化学家" },
+                { "text": "theatre", "meaning": "剧院" },
+                { "text": "visit a museum", "meaning": "参观一个博物馆" },
+                { "text": "near the university", "meaning": "靠近大学" },
+                { "text": "a brilliant hotel", "meaning": "一家非常棒的酒店" },
+                { "text": "restaurant", "meaning": "餐厅" }
+            ],
+            "Unit 9 词汇 1": [
+                { "text": "What's the hero called?", "meaning": "英雄叫什么名字?" },
+                { "text": "in Mexico", "meaning": "在墨西哥" },
+                { "text": "the comic book which he finished", "meaning": "他看完的漫画书" },
+                { "text": "noisy", "meaning": "吵的" },
+                { "text": "huge", "meaning": "巨大的" },
+                { "text": "alone", "meaning": "独自一人的" },
+                { "text": "strange", "meaning": "奇怪" },
+                { "text": "horrible", "meaning": "可怕" },
+                { "text": "little", "meaning": "小的" },
+                { "text": "lucky", "meaning": "幸运" },
+                { "text": "excellent", "meaning": "优秀" },
+                { "text": "special", "meaning": "特别" }
+            ],
+            "Unit 9 词汇 2": [
+                { "text": "This year's tour is over.", "meaning": "今年的巡演结束了。" },
+                { "text": "pack all your boxes", "meaning": "打包你的所有盒子" },
+                { "text": "the enormous tent", "meaning": "巨大的帐篷" },
+                { "text": "find my pyjamas", "meaning": "找到我的睡衣" },
+                { "text": "pack my trainers", "meaning": "打包我的运动鞋" },
+                { "text": "pack my suitcase", "meaning": "收拾我的手提箱" },
+                { "text": "rucksack", "meaning": "帆布背包" },
+                { "text": "make sandcastles by the sea", "meaning": "在海边制作沙堡" },
+                { "text": "postcard", "meaning": "明信片" },
+                { "text": "views of Mexico", "meaning": "墨西哥风景" },
+                { "text": "stamp", "meaning": "邮票" },
+                { "text": "the post office", "meaning": "邮局" }
+            ]
+        };
+
+        let currentDayWords = [];
+        let currentIndex = 0;
+        let isPaused = false;
+        let isRunning = false;
+
+        window.onload = function() {
+            initDaySelector();
+            loadDay();
+        };
+
+        function initDaySelector() {
+            const select = document.getElementById('daySelect');
+            const keys = Object.keys(wordData);
+            
+            keys.forEach(key => {
+                const option = document.createElement('option');
+                option.value = key;
+                option.text = key + ` (${wordData[key].length} words)`;
+                select.appendChild(option);
+            });
+        }
+
+        function loadDay() {
+            if (isRunning) {
+                alert("请先停止当前听写再切换天数！");
+                // 恢复之前的选择
+                const previousKey = Object.keys(wordData).find(key => wordData[key] === currentDayWords);
+                if (previousKey) document.getElementById('daySelect').value = previousKey;
+                return;
+            }
+            
+            const selectedDay = document.getElementById('daySelect').value;
+            currentDayWords = wordData[selectedDay];
+            
+            document.getElementById('totalCount').textContent = currentDayWords.length;
+            document.getElementById('currentProgress').textContent = `0 / ${currentDayWords.length}`;
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('progressBar').textContent = '0%';
+            
+            resetUI();
+        }
+
+        function resetUI() {
+            document.getElementById('answers').style.display = 'none';
+            document.getElementById('starting').style.display = 'flex';
+            document.getElementById('starting').textContent = '准备就绪，点击开始';
+            document.getElementById('currentWord').style.display = 'none';
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('resumeBtn').style.display = 'none';
+            document.getElementById('restartBtn').style.display = 'none';
+            document.getElementById('daySelect').disabled = false;
+            document.getElementById('repeatCount').disabled = false;
+            document.getElementById('waitTime').disabled = false;
+        }
+
+        function unlockAudio() {
+            // iPad/iOS 必须由用户交互（点击）触发一次播放，才能解锁后续的自动播放
+            const u = new SpeechSynthesisUtterance("");
+            window.speechSynthesis.speak(u);
+        }
+
+        async function startDictation() {
+            if (!('speechSynthesis' in window)) {
+                alert("您的浏览器不支持语音朗读功能，请使用 Chrome/Edge/Safari 等现代浏览器。");
+                return;
+            }
+
+            unlockAudio(); // 关键：在点击开始按钮时解锁音频
+
+            isRunning = true;
+            currentIndex = 0;
+            document.getElementById('daySelect').disabled = true;
+            document.getElementById('repeatCount').disabled = true;
+            document.getElementById('waitTime').disabled = true;
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('pauseBtn').style.display = 'inline-block';
+            document.getElementById('pauseBtn').disabled = false;
+            document.getElementById('restartBtn').style.display = 'none';
+            document.getElementById('answers').style.display = 'none';
+
+            const startingEl = document.getElementById('starting');
+            startingEl.style.display = 'flex';
+            
+            for (let i = 3; i > 0; i--) {
+                startingEl.textContent = `听写将在 ${i} 秒后开始...`;
+                await sleep(1000);
+            }
+            startingEl.style.display = 'none';
+            document.getElementById('currentWord').style.display = 'flex';
+
+            for (let i = 0; i < currentDayWords.length; i++) {
+                currentIndex = i;
+                updateProgress();
+                await dictateItem(i);
+                
+                while (isPaused) {
+                    await sleep(100);
+                }
+            }
+
+            finishDictation();
+        }
+
+        async function dictateItem(index) {
+            const word = currentDayWords[index];
+            const displayEl = document.getElementById('currentWord');
+            
+            const repeatCount = parseInt(document.getElementById('repeatCount').value);
+            const waitTime = parseInt(document.getElementById('waitTime').value);
+
+            displayEl.textContent = `单词 ${index + 1}`;
+            displayEl.style.color = "#2d3748";
+
+            for (let r = 0; r < repeatCount; r++) {
+                if (isPaused) return;
+                
+                await speak(word.text);
+                
+                if (r < repeatCount - 1) {
+                    await sleep(1500);
+                }
+            }
+
+            displayEl.style.color = "#718096";
+            for (let t = waitTime; t > 0; t--) {
+                if (isPaused) return;
+                displayEl.textContent = `等待 ${t} 秒...`;
+                await sleep(1000);
+            }
+        }
+
+        function speak(text) {
+            return new Promise((resolve) => {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US'; // 强制美式发音
+                utterance.rate = 0.65; // 慢速 0.65
+                
+                utterance.onend = () => {
+                    resolve();
+                };
+                
+                utterance.onerror = (e) => {
+                    console.error("Speech error:", e);
+                    resolve();
+                };
+
+                window.speechSynthesis.speak(utterance);
+            });
+        }
+
+        function updateProgress() {
+            const total = currentDayWords.length;
+            const current = currentIndex + 1;
+            const percentage = Math.round((current / total) * 100);
+            
+            document.getElementById('currentProgress').textContent = `${current} / ${total}`;
+            const bar = document.getElementById('progressBar');
+            bar.style.width = `${percentage}%`;
+            bar.textContent = `${percentage}%`;
+        }
+
+        function pauseDictation() {
+            isPaused = true;
+            window.speechSynthesis.cancel();
+            document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('resumeBtn').style.display = 'inline-block';
+            document.getElementById('currentWord').textContent = "已暂停";
+        }
+
+        function resumeDictation() {
+            isPaused = false;
+            document.getElementById('resumeBtn').style.display = 'none';
+            document.getElementById('pauseBtn').style.display = 'inline-block';
+        }
+
+        function resetDictation() {
+            window.speechSynthesis.cancel();
+            isRunning = false;
+            isPaused = false;
+            resetUI();
+            loadDay();
+        }
+
+        function finishDictation() {
+            isRunning = false;
+            document.getElementById('currentWord').textContent = "听写完成！";
+            document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('restartBtn').style.display = 'inline-block';
+            document.getElementById('daySelect').disabled = false;
+            document.getElementById('repeatCount').disabled = false;
+            document.getElementById('waitTime').disabled = false;
+            
+            showAnswers();
+        }
+
+        function showAnswers() {
+            const list = document.getElementById('answerList');
+            list.innerHTML = '';
+            
+            currentDayWords.forEach((word, index) => {
+                const item = document.createElement('div');
+                item.className = 'answer-item';
+                item.innerHTML = `
+                    <div class="answer-left">
+                        <span class="answer-number">${index + 1}.</span>
+                        <span class="answer-text">${word.text}</span>
+                    </div>
+                    <span class="answer-meaning">${word.meaning}</span>
+                `;
+                list.appendChild(item);
+            });
+
+            document.getElementById('answers').style.display = 'block';
+            document.getElementById('answers').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+    </script>
+</body>
+</html>
