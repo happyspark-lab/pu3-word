@@ -2,14 +2,13 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Power Up 3 单元词汇听写</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent; /* iPad点击高亮去除 */
         }
 
         body {
@@ -54,7 +53,6 @@
             background: white;
             font-weight: bold;
             max-width: 100%;
-            -webkit-appearance: none; /* iPad样式优化 */
         }
 
         .settings-row {
@@ -84,7 +82,6 @@
             padding: 8px 12px;
             font-size: 1rem;
             border: 1px solid #667eea;
-            background: white;
         }
 
         .status {
@@ -177,7 +174,6 @@
             transition: transform 0.2s;
             margin: 5px;
             box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
-            -webkit-appearance: none; /* iPad按钮样式修正 */
         }
 
         button:hover {
@@ -185,15 +181,22 @@
             box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
         }
 
-        button:active {
-            transform: translateY(1px); /* 触摸反馈 */
-        }
-
         button:disabled {
             background: #cbd5e0;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
+        }
+
+        .preview {
+            margin-top: 30px;
+        }
+
+        .preview-list {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px dashed #cbd5e0;
         }
 
         .answers {
@@ -213,7 +216,6 @@
             padding: 20px;
             max-height: 400px;
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch; /* iPad滚动优化 */
         }
 
         .answer-item {
@@ -242,13 +244,13 @@
 
         .answer-text {
             color: #2d3748;
-            font-size: 1.2em;
-            font-weight: 500;
+            font-size: 1.7em;
+            font-weight: 600;
         }
 
         .answer-meaning {
             color: #718096;
-            font-size: 1em;
+            font-size: 1.3em;
             text-align: right;
             margin-left: 10px;
             flex: 1;
@@ -264,6 +266,15 @@
         </div>
 
         <div class="settings-row">
+            <div class="setting-group">
+                <label>语速:</label>
+                <select id="speechRate">
+                    <option value="1">正常</option>
+                    <option value="0.9">稍慢</option>
+                    <option value="0.8" selected>较慢</option>
+                    <option value="0.7">很慢</option>
+                </select>
+            </div>
             <div class="setting-group">
                 <label>每词朗读:</label>
                 <select id="repeatCount">
@@ -309,6 +320,10 @@
             <button id="restartBtn" onclick="resetDictation()" style="display: none; background: #e53e3e;">重置</button>
         </div>
 
+        <div class="preview" id="previewArea">
+            <div class="preview-list" id="previewList"></div>
+        </div>
+
         <div class="answers" id="answers">
             <h2>📝 听写答案</h2>
             <div class="answer-list" id="answerList"></div>
@@ -316,7 +331,7 @@
     </div>
 
     <script>
-        // 词汇数据 (基于 PU3 指引单整理)
+        // 词汇数据 (PU3)
         const wordData = {
             "Unit 1 词汇 1": [
                 { "text": "in Russia", "meaning": "在俄罗斯" },
@@ -595,7 +610,6 @@
         function loadDay() {
             if (isRunning) {
                 alert("请先停止当前听写再切换天数！");
-                // 恢复之前的选择
                 const previousKey = Object.keys(wordData).find(key => wordData[key] === currentDayWords);
                 if (previousKey) document.getElementById('daySelect').value = previousKey;
                 return;
@@ -610,10 +624,29 @@
             document.getElementById('progressBar').textContent = '0%';
             
             resetUI();
+            renderPreview();
+        }
+
+        function renderPreview() {
+            const list = document.getElementById('previewList');
+            list.innerHTML = '';
+            currentDayWords.forEach((word, index) => {
+                const item = document.createElement('div');
+                item.className = 'answer-item';
+                item.innerHTML = `
+                    <div class="answer-left">
+                        <span class="answer-number">${index + 1}.</span>
+                        <span class="answer-text">${word.text}</span>
+                    </div>
+                    <span class="answer-meaning">${word.meaning}</span>
+                `;
+                list.appendChild(item);
+            });
         }
 
         function resetUI() {
             document.getElementById('answers').style.display = 'none';
+            document.getElementById('previewArea').style.display = 'block';
             document.getElementById('starting').style.display = 'flex';
             document.getElementById('starting').textContent = '准备就绪，点击开始';
             document.getElementById('currentWord').style.display = 'none';
@@ -622,12 +655,12 @@
             document.getElementById('resumeBtn').style.display = 'none';
             document.getElementById('restartBtn').style.display = 'none';
             document.getElementById('daySelect').disabled = false;
+            document.getElementById('speechRate').disabled = false;
             document.getElementById('repeatCount').disabled = false;
             document.getElementById('waitTime').disabled = false;
         }
 
         function unlockAudio() {
-            // iPad/iOS 必须由用户交互（点击）触发一次播放，才能解锁后续的自动播放
             const u = new SpeechSynthesisUtterance("");
             window.speechSynthesis.speak(u);
         }
@@ -638,11 +671,12 @@
                 return;
             }
 
-            unlockAudio(); // 关键：在点击开始按钮时解锁音频
+            unlockAudio();
 
             isRunning = true;
             currentIndex = 0;
             document.getElementById('daySelect').disabled = true;
+            document.getElementById('speechRate').disabled = true;
             document.getElementById('repeatCount').disabled = true;
             document.getElementById('waitTime').disabled = true;
             document.getElementById('startBtn').style.display = 'none';
@@ -650,6 +684,7 @@
             document.getElementById('pauseBtn').disabled = false;
             document.getElementById('restartBtn').style.display = 'none';
             document.getElementById('answers').style.display = 'none';
+            document.getElementById('previewArea').style.display = 'none';
 
             const startingEl = document.getElementById('starting');
             startingEl.style.display = 'flex';
@@ -705,8 +740,9 @@
         function speak(text) {
             return new Promise((resolve) => {
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-US'; // 强制美式发音
-                utterance.rate = 0.65; // 慢速 0.65
+                utterance.lang = 'en-US';
+                const selectedRate = document.getElementById('speechRate').value;
+                utterance.rate = parseFloat(selectedRate);
                 
                 utterance.onend = () => {
                     resolve();
@@ -760,8 +796,10 @@
             document.getElementById('pauseBtn').style.display = 'none';
             document.getElementById('restartBtn').style.display = 'inline-block';
             document.getElementById('daySelect').disabled = false;
+            document.getElementById('speechRate').disabled = false;
             document.getElementById('repeatCount').disabled = false;
             document.getElementById('waitTime').disabled = false;
+            document.getElementById('previewArea').style.display = 'none';
             
             showAnswers();
         }
