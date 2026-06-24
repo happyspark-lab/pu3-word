@@ -1,831 +1,732 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Power Up 3 单元词汇听写</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Power Up 3 英语单词闯关</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary:#6366f1;--primary-dark:#4338ca;--primary-light:#e0e7ff;
+            --accent:#f59e0b;--accent-light:#fef3c7;
+            --success:#10b981;--success-light:#d1fae5;
+            --danger:#ef4444;--danger-light:#fee2e2;
+            --bg:linear-gradient(135deg,#ede9fe 0%,#e0e7ff 50%,#dbeafe 100%);
+            --card:rgba(255,255,255,0.96);--text:#1e1b4b;--sub:#6b7280;
+            --border:rgba(99,102,241,0.15);--shadow:0 8px 32px rgba(99,102,241,0.15);
         }
+        *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+        body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif;background:var(--bg);min-height:100vh;color:var(--text);padding:12px;}
+        .screen{display:none;}.screen.active{display:block;}
+        .card{background:var(--card);border-radius:20px;box-shadow:var(--shadow);border:1px solid var(--border);padding:22px 18px;}
+        .btn{border:none;border-radius:50px;font-weight:800;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:6px;}
+        .btn:active{transform:scale(0.96);}
+        .btn-primary{background:linear-gradient(135deg,#6366f1,#4338ca);color:white;padding:14px 24px;font-size:1.1rem;width:100%;box-shadow:0 6px 20px rgba(99,102,241,0.35);}
+        .btn-accent{background:linear-gradient(135deg,#f59e0b,#d97706);color:white;padding:14px 24px;font-size:1.1rem;width:100%;box-shadow:0 6px 20px rgba(245,158,11,0.35);}
+        input[type="text"]{width:100%;padding:14px 16px;border:2px solid #e0e7ff;border-radius:12px;font-size:1rem;outline:none;transition:border-color 0.2s;background:#fafafe;}
+        input:focus{border-color:var(--primary);background:white;}
+        label{display:block;font-weight:700;margin-bottom:6px;color:#4338ca;font-size:0.9rem;}
+        .badge{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:20px;font-size:0.8rem;font-weight:700;}
+        .badge-green{background:var(--success-light);color:#065f46;}
+        .badge-red{background:var(--danger-light);color:#991b1b;}
+        select{width:100%;padding:10px 12px;border:2px solid #e0e7ff;border-radius:10px;font-size:0.95rem;background:white;font-weight:700;color:var(--text);outline:none;}
+        select:focus{border-color:var(--primary);}
+        .divider{height:1px;background:#e0e7ff;margin:14px 0;}
+        .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+        .page-title{font-size:1.15rem;font-weight:800;color:var(--text);}
+        .back-btn{background:var(--primary-light);color:var(--primary-dark);border:none;border-radius:20px;padding:6px 14px;font-weight:700;font-size:0.85rem;cursor:pointer;}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+        /* LOGIN */
+        #screen-login{max-width:420px;margin:0 auto;padding-top:40px;}
+        .login-hero{text-align:center;margin-bottom:28px;}
+        .login-hero .emoji{font-size:4rem;margin-bottom:8px;display:block;}
+        .login-hero h1{font-size:1.8rem;color:var(--primary-dark);font-weight:900;}
+        .login-hero p{color:var(--sub);font-size:0.9rem;margin-top:4px;}
+        .user-list-title{font-size:0.8rem;color:var(--sub);margin-bottom:8px;}
+        .user-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:var(--primary-light);border-radius:20px;margin:4px;cursor:pointer;font-weight:700;color:var(--primary-dark);font-size:0.9rem;border:2px solid transparent;transition:all 0.15s;}
+        .user-chip:active{border-color:var(--primary);transform:scale(0.97);}
+        .ios-tip{background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:10px 12px;font-size:0.8rem;color:#9a3412;margin-bottom:12px;display:none;}
 
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 40px;
-            max-width: 800px;
-            width: 100%;
-        }
+        /* HOME */
+        #screen-home{max-width:480px;margin:0 auto;}
+        .home-topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:8px;}
+        .stat-chip{flex:1;background:var(--card);border-radius:14px;padding:10px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.06);cursor:pointer;border:1px solid var(--border);transition:all 0.15s;}
+        .stat-chip:active{transform:scale(0.97);}
+        .stat-chip .num{font-size:1.4rem;font-weight:900;color:var(--primary-dark);}
+        .stat-chip .lbl{font-size:0.65rem;color:var(--sub);margin-top:1px;}
+        .stat-streak .num{color:#d97706;}.stat-mastered .num{color:#059669;}.stat-error .num{color:#dc2626;}
+        .greeting-bar{display:flex;align-items:center;justify-content:space-between;background:var(--card);border-radius:14px;padding:12px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:12px;border:1px solid var(--border);}
+        .greeting-name{font-size:1rem;font-weight:800;color:var(--text);}
+        .greeting-sub{font-size:0.75rem;color:var(--sub);margin-top:2px;}
+        .switch-user-btn{background:#f0f0f8;border:none;border-radius:20px;padding:6px 12px;font-size:0.75rem;font-weight:700;color:var(--sub);cursor:pointer;}
+        .selector-row{display:flex;gap:8px;margin-bottom:10px;}
+        .selector-row select{flex:1;}
+        .settings-row{display:flex;gap:8px;margin:12px 0;}
+        .setting-group{flex:1;background:#f8f7ff;border-radius:10px;padding:8px 6px;border:1px solid var(--border);text-align:center;}
+        .setting-group label{font-size:0.7rem;color:var(--sub);margin-bottom:3px;text-align:center;}
+        .setting-group select{font-size:0.85rem;padding:4px 2px;border:none;background:transparent;}
+        .review-quick-btn{width:100%;padding:15px 20px;background:linear-gradient(135deg,#f59e0b,#d97706);color:white;border:none;border-radius:14px;font-size:1.05rem;font-weight:800;cursor:pointer;box-shadow:0 6px 20px rgba(245,158,11,0.35);margin-bottom:10px;display:none;align-items:center;justify-content:space-between;}
+        .review-quick-btn .rqb-left{display:flex;align-items:center;gap:8px;}
+        .review-quick-btn .rqb-count{background:rgba(255,255,255,0.28);border-radius:20px;padding:3px 12px;font-size:0.9rem;font-weight:700;}
+        .review-alert{background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #f59e0b;border-radius:14px;padding:14px 16px;margin-bottom:12px;display:none;}
+        .review-alert-title{font-weight:800;color:#92400e;font-size:0.95rem;}
+        .review-alert-sub{font-size:0.8rem;color:#a16207;margin-top:4px;}
+        .preview-section{margin-top:10px;}
+        .preview-label{font-size:0.8rem;font-weight:700;color:var(--primary-dark);margin-bottom:8px;}
+        .preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;max-height:300px;overflow-y:auto;}
+        .preview-item{background:white;border:1px solid var(--border);border-radius:10px;padding:12px 8px;text-align:center;}
+        .preview-item .word{font-size:2.4rem;font-weight:800;color:var(--text);word-break:break-all;line-height:1.3;}
+        .preview-item .cn{font-size:0.78rem;color:var(--sub);margin-top:4px;}
+        .preview-item .num{font-size:0.65rem;color:#aaa;display:block;margin-bottom:2px;}
 
-        h1 {
-            color: #667eea;
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 2.2em;
-        }
+        /* RUNNING */
+        #screen-running{max-width:480px;margin:0 auto;}
+        .run-header{text-align:center;margin-bottom:12px;}
+        .run-unit-badge{background:var(--primary-light);color:var(--primary-dark);border-radius:20px;padding:5px 14px;font-size:0.8rem;font-weight:700;display:inline-block;}
+        .progress-wrap{margin:10px 0;}
+        .progress-bar{height:10px;background:#e0e7ff;border-radius:10px;overflow:hidden;}
+        .progress-fill{height:100%;background:linear-gradient(90deg,#6366f1,#a78bfa);width:0%;transition:width 0.3s ease-out;border-radius:10px;}
+        .progress-text{text-align:right;font-size:0.75rem;color:var(--sub);margin-top:3px;}
+        .word-stage{text-align:center;padding:20px 10px;}
+        .word-ordinal{font-size:0.85rem;color:var(--sub);margin-bottom:8px;}
+        .big-word{font-size:2.2rem;font-weight:900;color:var(--text);min-height:70px;letter-spacing:1px;word-break:break-all;line-height:1.3;}
+        .status-msg{color:var(--sub);font-size:0.9rem;margin-top:8px;min-height:24px;}
+        .countdown-ring{width:54px;height:54px;margin:10px auto;}
+        .countdown-ring svg{width:54px;height:54px;transform:rotate(-90deg);}
+        .countdown-ring circle{fill:none;stroke:#e0e7ff;stroke-width:5;}
+        .countdown-ring .arc{stroke:#6366f1;stroke-linecap:round;transition:stroke-dashoffset 0.1s linear;}
+        .countdown-num{position:relative;top:-42px;text-align:center;font-size:1.1rem;font-weight:900;color:var(--primary-dark);}
+        .run-btns{display:flex;gap:10px;margin-top:6px;}
+        .run-btn{flex:1;padding:11px;border-radius:12px;border:none;font-weight:700;font-size:0.9rem;cursor:pointer;}
+        .run-btn-pause{background:#e0e7ff;color:#4338ca;}
+        .run-btn-stop{background:#fee2e2;color:#b91c1c;}
 
-        .day-selector {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+        /* RESULT */
+        #screen-result{max-width:480px;margin:0 auto;}
+        .result-hero{text-align:center;padding:16px 0 10px;}
+        .result-star{font-size:3rem;}
+        .result-title{font-size:1.3rem;font-weight:900;margin-top:6px;color:var(--primary-dark);}
+        .result-score{font-size:2.2rem;font-weight:900;color:var(--success);margin:6px 0;}
+        .result-streak{font-size:0.9rem;color:var(--sub);}
+        .result-encourage{background:linear-gradient(135deg,#e0e7ff,#dbeafe);border-radius:12px;padding:12px 16px;margin:12px 0;font-weight:700;color:#3730a3;text-align:center;font-size:0.95rem;}
+        .answer-check-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:10px;}
+        .answer-check-item{background:white;border:2px solid #e0e7ff;border-radius:10px;padding:12px 8px;text-align:center;position:relative;}
+        .answer-check-item .word{font-size:2.4rem;font-weight:800;color:var(--text);word-break:break-all;line-height:1.3;}
+        .answer-check-item .cn{font-size:0.78rem;color:var(--sub);margin-top:4px;}
+        .answer-check-item .num{font-size:0.65rem;color:#aaa;display:block;margin-bottom:2px;}
+        .answer-check-item.wrong{border-color:#fca5a5;background:#fff1f2;}
+        .answer-check-item.wrong .word{color:#b91c1c;}
+        .check-box{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:5px;border:2px solid #d1d5db;background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.7rem;}
+        .check-box.checked{background:#fee2e2;border-color:#fca5a5;color:#b91c1c;}
+        .result-summary{display:flex;gap:10px;justify-content:center;margin:12px 0;}
+        .summary-chip{padding:8px 16px;border-radius:20px;font-weight:700;font-size:0.85rem;}
 
-        select {
-            padding: 10px 20px;
-            font-size: 1.1em;
-            border-radius: 10px;
-            border: 2px solid #667eea;
-            color: #2d3748;
-            outline: none;
-            cursor: pointer;
-            background: white;
-            font-weight: bold;
-            max-width: 100%;
-        }
+        /* WORD LISTS */
+        #screen-mastered,#screen-errors{max-width:480px;margin:0 auto;}
+        .word-list-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:10px;}
+        .word-card{background:white;border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center;}
+        .word-card .w{font-size:0.95rem;font-weight:800;color:var(--text);word-break:break-all;}
+        .word-card .wc{font-size:0.75rem;color:var(--sub);margin-top:3px;}
+        .word-card .cnt{font-size:0.7rem;color:var(--sub);margin-top:3px;}
+        .empty-tip{text-align:center;color:var(--sub);padding:30px;font-size:0.9rem;}
 
-        .settings-row {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            background: #f7fafc;
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px dashed #cbd5e0;
-        }
-
-        .setting-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .setting-group label {
-            color: #4a5568;
-            font-weight: 600;
-        }
-
-        .setting-group select {
-            padding: 8px 12px;
-            font-size: 1rem;
-            border: 1px solid #667eea;
-        }
-
-        .status {
-            background: #f7fafc;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-        }
-
-        .status-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 5px 10px;
-        }
-
-        .label {
-            color: #718096;
-            font-size: 0.9em;
-            margin-bottom: 5px;
-        }
-
-        .value {
-            color: #2d3748;
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-
-        .progress {
-            background: #e2e8f0;
-            border-radius: 10px;
-            height: 30px;
-            margin-bottom: 30px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .progress-bar {
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            height: 100%;
-            width: 0%;
-            transition: width 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-        }
-
-        .current-word {
-            text-align: center;
-            font-size: 2.2em;
-            font-weight: bold;
-            color: #2d3748;
-            margin: 40px 0;
-            min-height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1.2;
-        }
-
-        .starting {
-            text-align: center;
-            font-size: 1.5em;
-            color: #667eea;
-            margin: 40px 0;
-            min-height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .controls {
-            text-align: center;
-            margin-top: 30px;
-        }
-
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.2em;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: transform 0.2s;
-            margin: 5px;
-            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
-        }
-
-        button:disabled {
-            background: #cbd5e0;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .preview {
-            margin-top: 30px;
-        }
-
-        .preview-list {
-            background: #f7fafc;
-            border-radius: 10px;
-            padding: 20px;
-            border: 1px dashed #cbd5e0;
-        }
-
-        .answers {
-            display: none;
-            margin-top: 30px;
-        }
-
-        .answers h2 {
-            color: #667eea;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .answer-list {
-            background: #f7fafc;
-            border-radius: 10px;
-            padding: 20px;
-        }
-
-        .answer-item {
-            padding: 12px;
-            margin-bottom: 8px;
-            background: white;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .answer-left {
-            display: flex;
-            align-items: center;
-            flex: 1;
-        }
-
-        .answer-number {
-            color: #667eea;
-            font-weight: bold;
-            margin-right: 15px;
-            min-width: 30px;
-        }
-
-        .answer-text {
-            color: #2d3748;
-            font-size: 1.7em;
-            font-weight: 600;
-        }
-
-        .answer-meaning {
-            color: #718096;
-            font-size: 1.3em;
-            text-align: right;
-            margin-left: 10px;
-            flex: 1;
-        }
+        @keyframes popIn{0%{transform:scale(0.85);opacity:0}100%{transform:scale(1);opacity:1}}
+        @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+        .pop-in{animation:popIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;}
+        .shake{animation:shake 0.4s ease both;}
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎧 Power Up 3 单元词汇听写</h1>
 
-        <div class="day-selector">
-            <select id="daySelect" onchange="loadDay()"></select>
+<!-- LOGIN -->
+<div id="screen-login" class="screen active">
+    <div class="login-hero">
+        <span class="emoji">🚀</span>
+        <h1>Power Up 3 闯关</h1>
+        <p>每天坚持，成为单词大师！</p>
+    </div>
+    <div id="iosTip" class="ios-tip">📱 <b>iPhone用户：</b>请关闭侧边静音键，调大媒体音量再开始。</div>
+    <div class="card">
+        <div id="existing-users-box" style="display:none">
+            <div class="user-list-title">本设备已有账号，点击直接进入：</div>
+            <div id="user-chips"></div>
+            <div class="divider"></div>
         </div>
+        <label>输入学号 ID</label>
+        <input type="text" id="login-id" placeholder="例如：S001" maxlength="20" onkeydown="if(event.key==='Enter') doLogin()">
+        <div style="font-size:0.78rem;color:var(--sub);margin:6px 0 14px;">首次输入学号会自动创建账号，数据保存在本设备。</div>
+        <button class="btn btn-primary" onclick="doLogin()">🎮 进入闯关</button>
+        <div id="login-error" style="color:#dc2626;font-size:0.85rem;margin-top:10px;text-align:center;display:none;"></div>
+    </div>
+</div>
 
+<!-- HOME -->
+<div id="screen-home" class="screen">
+    <div class="home-topbar">
+        <div class="stat-chip stat-streak"><div class="num" id="stat-streak">0</div><div class="lbl">🔥 坚持天数</div></div>
+        <div class="stat-chip stat-mastered" onclick="openScreen('screen-mastered')"><div class="num" id="stat-mastered">0</div><div class="lbl">⭐ 已掌握词</div></div>
+        <div class="stat-chip stat-error" onclick="openScreen('screen-errors')"><div class="num" id="stat-error">0</div><div class="lbl">📝 错题本</div></div>
+    </div>
+    <div class="greeting-bar">
+        <div>
+            <div class="greeting-name" id="greeting-name">Hi！</div>
+            <div class="greeting-sub" id="greeting-sub">今天也要加油哦！</div>
+        </div>
+        <button class="switch-user-btn" onclick="openScreen('screen-login')">切换账号</button>
+    </div>
+    <button class="review-quick-btn" id="review-quick-btn" onclick="startReviewDictation()">
+        <span class="rqb-left">🔥 练习错词</span>
+        <span class="rqb-count" id="review-quick-count">0个待练</span>
+    </button>
+    <div id="review-alert" class="review-alert">
+        <div class="review-alert-title">🎯 错误单词超过10个，建议先复习一下！</div>
+        <div class="review-alert-sub">点击下方按钮开始复习错词</div>
+        <button class="btn btn-accent" style="margin-top:10px;" onclick="startReviewDictation()">🔁 去复习错词</button>
+    </div>
+    <div class="card">
+        <div class="selector-row">
+            <select id="sel-grade" onchange="onGradeChange()"></select>
+            <select id="sel-unit"  onchange="onUnitChange()"></select>
+        </div>
         <div class="settings-row">
-            <div class="setting-group">
-                <label>语速:</label>
-                <select id="speechRate">
-                    <option value="1">正常</option>
-                    <option value="0.9">稍慢</option>
-                    <option value="0.8" selected>较慢</option>
-                    <option value="0.7">很慢</option>
-                </select>
+            <div class="setting-group"><label>🗣️ 语速</label>
+                <select id="set-rate"><option value="0.85">正常</option><option value="0.7" selected>稍慢</option><option value="0.55">较慢</option></select>
             </div>
-            <div class="setting-group">
-                <label>每词朗读:</label>
-                <select id="repeatCount">
-                    <option value="1">1次</option>
-                    <option value="2">2次</option>
-                    <option value="3" selected>3次</option>
-                </select>
+            <div class="setting-group"><label>🔁 次数</label>
+                <select id="set-repeat"><option value="1">1次</option><option value="2" selected>2次</option><option value="3">3次</option></select>
             </div>
-            <div class="setting-group">
-                <label>写字时长:</label>
-                <select id="waitTime">
-                    <option value="5">5秒</option>
-                    <option value="8">8秒</option>
-                    <option value="10" selected>10秒</option>
-                    <option value="12">12秒</option>
-                    <option value="15">15秒</option>
-                </select>
+            <div class="setting-group"><label>✍️ 书写</label>
+                <select id="set-wait"><option value="5">5秒</option><option value="8" selected>8秒</option><option value="10">10秒</option><option value="12">12秒</option></select>
+            </div>
+            <div class="setting-group"><label>🔀 顺序</label>
+                <select id="set-order"><option value="order" selected>顺序</option><option value="random">随机</option></select>
             </div>
         </div>
-
-        <div class="status">
-            <div class="status-item">
-                <span class="label">本组词数</span>
-                <span class="value" id="totalCount">0</span>
-            </div>
-            <div class="status-item">
-                <span class="label">当前进度</span>
-                <span class="value" id="currentProgress">0 / 0</span>
-            </div>
-        </div>
-
-        <div class="progress">
-            <div class="progress-bar" id="progressBar">0%</div>
-        </div>
-
-        <div class="current-word" id="currentWord" style="display: none;"></div>
-        <div class="starting" id="starting">准备开始...</div>
-
-        <div class="controls">
-            <button id="startBtn" onclick="startDictation()">开始听写</button>
-            <button id="pauseBtn" onclick="pauseDictation()" style="display: none;" disabled>暂停</button>
-            <button id="resumeBtn" onclick="resumeDictation()" style="display: none;">继续</button>
-            <button id="restartBtn" onclick="resetDictation()" style="display: none; background: #e53e3e;">重置</button>
-        </div>
-
-        <div class="preview" id="previewArea">
-            <div class="preview-list" id="previewList"></div>
-        </div>
-
-        <div class="answers" id="answers">
-            <h2>📝 听写答案</h2>
-            <div class="answer-list" id="answerList"></div>
+        <button class="btn btn-primary" onclick="startDictation()">🚀 开始听写</button>
+        <div class="preview-section">
+            <div class="divider"></div>
+            <div class="preview-label">📋 本单元单词预习</div>
+            <div class="preview-grid" id="preview-grid"></div>
         </div>
     </div>
+</div>
 
-    <script>
-        // 词汇数据 (PU3)
-        const wordData = {
-            "Unit 1 词汇 1": [
-                { "text": "in Russia", "meaning": "在俄罗斯" },
-                { "text": "talk about meals", "meaning": "谈论食物" },
-                { "text": "meal times", "meaning": "用餐时间" },
-                { "text": "half past twelve", "meaning": "12点半" },
-                { "text": "seven o'clock", "meaning": "7点钟" },
-                { "text": "midnight", "meaning": "午夜" },
-                { "text": "half past six", "meaning": "6点半" },
-                { "text": "half past eight", "meaning": "8点半" },
-                { "text": "eight o'clock", "meaning": "8点钟" },
-                { "text": "half past nine", "meaning": "9点半" },
-                { "text": "midday", "meaning": "正午" },
-                { "text": "What time is it?", "meaning": "现在几点?" },
-                { "text": "It's half past twelve.", "meaning": "现在是12点半。" },
-                { "text": "breakfast", "meaning": "早餐" },
-                { "text": "a snack", "meaning": "一顿小吃" },
-                { "text": "lunch", "meaning": "午餐" },
-                { "text": "dinner", "meaning": "晚餐" },
-                { "text": "wake up", "meaning": "起床" },
-                { "text": "go to bed", "meaning": "去睡觉" }
-            ],
-            "Unit 1 词汇 2": [
-                { "text": "catch", "meaning": "抓住" },
-                { "text": "hop", "meaning": "单脚跳" },
-                { "text": "skip", "meaning": "跳绳" },
-                { "text": "dance", "meaning": "跳舞" },
-                { "text": "jump to your places", "meaning": "跳到你的位置" },
-                { "text": "practice time", "meaning": "练习时间" },
-                { "text": "Are you in or out?", "meaning": "你是加入还是退出?" },
-                { "text": "be quiet", "meaning": "保持安静" },
-                { "text": "mustn't shout", "meaning": "禁止大叫" },
-                { "text": "don't laugh", "meaning": "不要笑" },
-                { "text": "with a smile on your face", "meaning": "面带微笑" },
-                { "text": "hold her legs", "meaning": "抓住她的腿" },
-                { "text": "fall into the net", "meaning": "落入网中" },
-                { "text": "dress up", "meaning": "打扮" },
-                { "text": "jump", "meaning": "跳" },
-                { "text": "climb", "meaning": "攀登" }
-            ],
-            "Unit 2 词汇 1": [
-                { "text": "in China", "meaning": "在中国" },
-                { "text": "in the supermarket", "meaning": "在超市里" },
-                { "text": "shop for food", "meaning": "买食物" },
-                { "text": "tea", "meaning": "茶" },
-                { "text": "cup", "meaning": "杯" },
-                { "text": "coffee", "meaning": "咖啡" },
-                { "text": "milkshake", "meaning": "奶昔" },
-                { "text": "glass", "meaning": "杯" },
-                { "text": "cereal", "meaning": "谷物食物" },
-                { "text": "sauce", "meaning": "酱" },
-                { "text": "pancake", "meaning": "薄煎饼" },
-                { "text": "noodles", "meaning": "面条" },
-                { "text": "strawberries", "meaning": "草莓" },
-                { "text": "yogurt", "meaning": "酸奶" },
-                { "text": "a glass of milkshake", "meaning": "一杯牛奶" },
-                { "text": "a cup of coffee", "meaning": "一杯咖啡" },
-                { "text": "a bottle of chocolate sauce", "meaning": "一瓶巧克力酱" },
-                { "text": "a bowl of cereal", "meaning": "一碗谷物食物" }
-            ],
-            "Unit 2 词汇 2": [
-                { "text": "drove (drive) to town", "meaning": "开车去城镇" },
-                { "text": "the place where May grew (grow) up", "meaning": "May 长大的地方" },
-                { "text": "the teacher who taught (teach) her", "meaning": "教过她的老师" },
-                { "text": "got (get) dressed up", "meaning": "穿衣打扮" },
-                { "text": "took (take) some photos", "meaning": "拍一些照片" },
-                { "text": "gave (give)", "meaning": "给" },
-                { "text": "climbed (climb)", "meaning": "攀登" },
-                { "text": "wrote (write) this song", "meaning": "写这首歌" }
-            ],
-            "Unit 3 词汇 1": [
-                { "text": "do exercise", "meaning": "做训练" },
-                { "text": "on the beach", "meaning": "在海滩上" },
-                { "text": "bandage", "meaning": "绷带" },
-                { "text": "knee", "meaning": "膝盖" },
-                { "text": "stomach", "meaning": "胃" },
-                { "text": "shoulder", "meaning": "肩膀" },
-                { "text": "neck", "meaning": "脖子" },
-                { "text": "toe", "meaning": "脚趾" },
-                { "text": "finger", "meaning": "手指" },
-                { "text": "elbow", "meaning": "肘部" },
-                { "text": "back", "meaning": "背部" }
-            ],
-            "Unit 3 词汇 2": [
-                { "text": "is/am/are sick", "meaning": "生病了" },
-                { "text": "is/am/are ill", "meaning": "不舒服" },
-                { "text": "be quick", "meaning": "快点" },
-                { "text": "What's the problem?", "meaning": "什么问题?" },
-                { "text": "What's the matter?", "meaning": "怎么了?" },
-                { "text": "have/has got a cough", "meaning": "咳嗽" },
-                { "text": "have/has got a temperature", "meaning": "发烧" },
-                { "text": "have/has got sore throat", "meaning": "喉咙痛" },
-                { "text": "have/has got a cold", "meaning": "感冒" },
-                { "text": "have/has got a backache", "meaning": "背痛" },
-                { "text": "My stomach hurts.", "meaning": "我的胃痛。" }
-            ],
-            "Unit 4 词汇 1": [
-                { "text": "in India", "meaning": "在印度" },
-                { "text": "star", "meaning": "星星" },
-                { "text": "jungle", "meaning": "丛林" },
-                { "text": "world", "meaning": "世界" },
-                { "text": "waterfall", "meaning": "瀑布" },
-                { "text": "moon", "meaning": "月亮" },
-                { "text": "sky", "meaning": "天空" },
-                { "text": "plant", "meaning": "植物" },
-                { "text": "wave", "meaning": "海浪" },
-                { "text": "island", "meaning": "岛" }
-            ],
-            "Unit 4 词汇 2": [
-                { "text": "drove (drive) to the beach", "meaning": "开车去海滩" },
-                { "text": "sailed (sail) on the sea", "meaning": "在海上航行" },
-                { "text": "threw (throw) our nets", "meaning": "扔我们的网" },
-                { "text": "caught (catch) some fish", "meaning": "抓些鱼" },
-                { "text": "bounced (bounce)", "meaning": "弹跳" },
-                { "text": "hopped (hop)", "meaning": "单脚跳行" },
-                { "text": "skipped (skip)", "meaning": "跳绳" },
-                { "text": "kicked (kick)", "meaning": "踢" }
-            ],
-            "Unit 5 词汇 1": [
-                { "text": "in Greece", "meaning": "在希腊" },
-                { "text": "wing", "meaning": "翅膀" },
-                { "text": "striped", "meaning": "有条纹的" },
-                { "text": "spotted", "meaning": "有斑点的" },
-                { "text": "silver", "meaning": "银色的" },
-                { "text": "bright", "meaning": "明亮的" },
-                { "text": "gold", "meaning": "金色的" },
-                { "text": "light", "meaning": "淡色的" },
-                { "text": "dark", "meaning": "暗色的" }
-            ],
-            "Unit 5 词汇 2": [
-                { "text": "make all day long", "meaning": "做一整天" },
-                { "text": "plastic", "meaning": "塑料" },
-                { "text": "wool", "meaning": "羊毛" },
-                { "text": "wood", "meaning": "木材" },
-                { "text": "cut them up", "meaning": "把他们剪碎" },
-                { "text": "cut them out", "meaning": "切出来" },
-                { "text": "glue", "meaning": "胶水" },
-                { "text": "These scissors are made of metal.", "meaning": "这剪刀是金属做的。" },
-                { "text": "This scarf is made of wool.", "meaning": "这条围巾是羊毛做的。" },
-                { "text": "My box is made of plastic.", "meaning": "我的盒子是塑料做的。" },
-                { "text": "My table's made of wood.", "meaning": "我的桌子是木头做的。" },
-                { "text": "That crown is made of brown card.", "meaning": "王冠是用棕色卡片做的。" },
-                { "text": "silver wings", "meaning": "银色的翅膀" }
-            ],
-            "Unit 6 词汇 1": [
-                { "text": "in Turkey", "meaning": "在土耳其" },
-                { "text": "geography", "meaning": "地理" },
-                { "text": "history", "meaning": "历史" },
-                { "text": "sports", "meaning": "运动" },
-                { "text": "maths", "meaning": "数学" },
-                { "text": "language", "meaning": "语言" },
-                { "text": "music", "meaning": "音乐" },
-                { "text": "science", "meaning": "科学" },
-                { "text": "IT", "meaning": "信息技术" },
-                { "text": "art", "meaning": "美术" }
-            ],
-            "Unit 6 词汇 2": [
-                { "text": "laptop", "meaning": "笔记本电脑" },
-                { "text": "apps", "meaning": "应用软件" },
-                { "text": "an e-book", "meaning": "一本电子书" },
-                { "text": "a special rucksack", "meaning": "一个特殊的帆布背包" },
-                { "text": "an online dictionary", "meaning": "一本在线词典" },
-                { "text": "bin", "meaning": "箱子" },
-                { "text": "Internet", "meaning": "互联网" },
-                { "text": "find safe websites", "meaning": "查找安全网站" },
-                { "text": "paste a photo or two", "meaning": "粘贴两张照片" },
-                { "text": "scissors", "meaning": "剪刀" },
-                { "text": "glue", "meaning": "胶" }
-            ],
-            "Unit 7 词汇 1": [
-                { "text": "in Spain", "meaning": "在西班牙" },
-                { "text": "actor", "meaning": "演员" },
-                { "text": "waiter", "meaning": "服务员" },
-                { "text": "cook", "meaning": "厨师" },
-                { "text": "driver", "meaning": "驾驶员" },
-                { "text": "journalist", "meaning": "记者" },
-                { "text": "photographer", "meaning": "摄影师" },
-                { "text": "artist", "meaning": "艺术家" },
-                { "text": "designer", "meaning": "设计师" },
-                { "text": "singer", "meaning": "歌手" },
-                { "text": "acrobat", "meaning": "杂技演员" }
-            ],
-            "Unit 7 词汇 2": [
-                { "text": "What's he like?", "meaning": "他是什么样子的?" },
-                { "text": "interesting", "meaning": "有趣的" },
-                { "text": "kind", "meaning": "友善的" },
-                { "text": "friendly", "meaning": "友好的" },
-                { "text": "clever", "meaning": "聪明的" },
-                { "text": "lazy", "meaning": "懒惰的" },
-                { "text": "lovely", "meaning": "可爱的" },
-                { "text": "unkind", "meaning": "不友善" },
-                { "text": "unfriendly", "meaning": "不友好" },
-                { "text": "popular", "meaning": "欢迎" },
-                { "text": "brave", "meaning": "勇敢的" }
-            ],
-            "Unit 8 词汇 1": [
-                { "text": "city break", "meaning": "城市休息" },
-                { "text": "in the USA", "meaning": "在美国" },
-                { "text": "They're lost.", "meaning": "他们迷路了" },
-                { "text": "north", "meaning": "北" },
-                { "text": "east", "meaning": "东" },
-                { "text": "south", "meaning": "南" },
-                { "text": "west", "meaning": "西" },
-                { "text": "left", "meaning": "左" },
-                { "text": "right", "meaning": "右" },
-                { "text": "straight on", "meaning": "一直向前" },
-                { "text": "on road 95", "meaning": "在95号公路上" },
-                { "text": "get to road 9", "meaning": "到达9号公路" }
-            ],
-            "Unit 8 词汇 2": [
-                { "text": "airport", "meaning": "机场" },
-                { "text": "buildings", "meaning": "建筑物" },
-                { "text": "banks", "meaning": "银行" },
-                { "text": "money", "meaning": "钱" },
-                { "text": "post office", "meaning": "邮局" },
-                { "text": "buy some stamps", "meaning": "买一些邮票" },
-                { "text": "chemist", "meaning": "化学家" },
-                { "text": "theatre", "meaning": "剧院" },
-                { "text": "visit a museum", "meaning": "参观一个博物馆" },
-                { "text": "near the university", "meaning": "靠近大学" },
-                { "text": "a brilliant hotel", "meaning": "一家非常棒的酒店" },
-                { "text": "restaurant", "meaning": "餐厅" }
-            ],
-            "Unit 9 词汇 1": [
-                { "text": "What's the hero called?", "meaning": "英雄叫什么名字?" },
-                { "text": "in Mexico", "meaning": "在墨西哥" },
-                { "text": "the comic book which he finished", "meaning": "他看完的漫画书" },
-                { "text": "noisy", "meaning": "吵的" },
-                { "text": "huge", "meaning": "巨大的" },
-                { "text": "alone", "meaning": "独自一人的" },
-                { "text": "strange", "meaning": "奇怪" },
-                { "text": "horrible", "meaning": "可怕" },
-                { "text": "little", "meaning": "小的" },
-                { "text": "lucky", "meaning": "幸运" },
-                { "text": "excellent", "meaning": "优秀" },
-                { "text": "special", "meaning": "特别" }
-            ],
-            "Unit 9 词汇 2": [
-                { "text": "This year's tour is over.", "meaning": "今年的巡演结束了。" },
-                { "text": "pack all your boxes", "meaning": "打包你的所有盒子" },
-                { "text": "the enormous tent", "meaning": "巨大的帐篷" },
-                { "text": "find my pyjamas", "meaning": "找到我的睡衣" },
-                { "text": "pack my trainers", "meaning": "打包我的运动鞋" },
-                { "text": "pack my suitcase", "meaning": "收拾我的手提箱" },
-                { "text": "rucksack", "meaning": "帆布背包" },
-                { "text": "make sandcastles by the sea", "meaning": "在海边制作沙堡" },
-                { "text": "postcard", "meaning": "明信片" },
-                { "text": "views of Mexico", "meaning": "墨西哥风景" },
-                { "text": "stamp", "meaning": "邮票" },
-                { "text": "the post office", "meaning": "邮局" }
-            ]
-        };
+<!-- RUNNING -->
+<div id="screen-running" class="screen">
+    <div class="card">
+        <div class="run-header"><span class="run-unit-badge" id="run-unit-name">Unit</span></div>
+        <div class="progress-wrap">
+            <div class="progress-bar"><div class="progress-fill" id="run-progress-fill"></div></div>
+            <div class="progress-text" id="run-progress-text">0 / 0</div>
+        </div>
+        <div class="word-stage">
+            <div class="word-ordinal" id="run-ordinal">第 1 个</div>
+            <div class="big-word" id="run-word">Ready</div>
+            <div class="status-msg" id="run-status">准备中...</div>
+            <div class="countdown-ring" id="countdown-wrap" style="display:none">
+                <svg viewBox="0 0 54 54">
+                    <circle cx="27" cy="27" r="22"/>
+                    <circle class="arc" id="countdown-arc" cx="27" cy="27" r="22" stroke-dasharray="138.2" stroke-dashoffset="0"/>
+                </svg>
+                <div class="countdown-num" id="countdown-num">8</div>
+            </div>
+        </div>
+        <div class="run-btns">
+            <button class="run-btn run-btn-pause" id="pause-btn" onclick="togglePause()">⏸ 暂停</button>
+            <button class="run-btn run-btn-stop" onclick="stopDictation()">⏹ 结束</button>
+        </div>
+    </div>
+</div>
 
-        let currentDayWords = [];
-        let currentIndex = 0;
-        let isPaused = false;
-        let isRunning = false;
+<!-- RESULT -->
+<div id="screen-result" class="screen">
+    <div class="card">
+        <div class="result-hero">
+            <div class="result-star" id="result-star">🌟</div>
+            <div class="result-title">听写完成！</div>
+            <div class="result-score" id="result-score">0分</div>
+            <div class="result-streak" id="result-streak"></div>
+        </div>
+        <div class="result-encourage" id="result-encourage">加油！继续坚持！</div>
+        <div class="result-summary">
+            <span class="summary-chip badge-green" id="sum-correct">✅ 0 个全对</span>
+            <span class="summary-chip badge-red" id="sum-wrong">❌ 0 个错误</span>
+        </div>
+        <div class="divider"></div>
+        <div style="font-weight:700;color:#4338ca;font-size:0.85rem;margin-bottom:6px;">📋 核对答案（点击打错）</div>
+        <div class="answer-check-grid" id="answer-check-grid"></div>
+        <div style="height:16px"></div>
+        <button class="btn btn-primary" onclick="submitResult()">✅ 提交结果</button>
+        <div style="height:10px"></div>
+        <button class="btn" style="background:#f0f0f8;color:#4338ca;padding:12px;width:100%;font-size:0.95rem;font-weight:700;" onclick="openScreen('screen-home')">🏠 返回主页</button>
+    </div>
+</div>
 
-        window.onload = function() {
-            initDaySelector();
-            loadDay();
-        };
+<!-- MASTERED -->
+<div id="screen-mastered" class="screen">
+    <div class="card">
+        <div class="page-header"><div class="page-title">⭐ 已掌握单词</div><button class="back-btn" onclick="openScreen('screen-home')">返回</button></div>
+        <div id="mastered-content"></div>
+    </div>
+</div>
 
-        function initDaySelector() {
-            const select = document.getElementById('daySelect');
-            const keys = Object.keys(wordData);
-            
-            keys.forEach(key => {
-                const option = document.createElement('option');
-                option.value = key;
-                option.text = key + ` (${wordData[key].length} words)`;
-                select.appendChild(option);
-            });
-        }
+<!-- ERRORS -->
+<div id="screen-errors" class="screen">
+    <div class="card">
+        <div class="page-header"><div class="page-title">📝 错题本</div><button class="back-btn" onclick="openScreen('screen-home')">返回</button></div>
+        <div id="errors-content"></div>
+        <div style="height:12px"></div>
+        <button class="btn btn-accent" id="error-review-btn" onclick="startReviewDictation()" style="display:none;">🔁 开始复习错词</button>
+    </div>
+</div>
 
-        function loadDay() {
-            if (isRunning) {
-                alert("请先停止当前听写再切换天数！");
-                const previousKey = Object.keys(wordData).find(key => wordData[key] === currentDayWords);
-                if (previousKey) document.getElementById('daySelect').value = previousKey;
-                return;
-            }
-            
-            const selectedDay = document.getElementById('daySelect').value;
-            currentDayWords = wordData[selectedDay];
-            
-            document.getElementById('totalCount').textContent = currentDayWords.length;
-            document.getElementById('currentProgress').textContent = `0 / ${currentDayWords.length}`;
-            document.getElementById('progressBar').style.width = '0%';
-            document.getElementById('progressBar').textContent = '0%';
-            
-            resetUI();
-            renderPreview();
-        }
+<script>
+window.onerror = function(msg,src,line){console.error('JS Error line '+line+': '+msg);};
 
-        function renderPreview() {
-            const list = document.getElementById('previewList');
-            list.innerHTML = '';
-            currentDayWords.forEach((word, index) => {
-                const item = document.createElement('div');
-                item.className = 'answer-item';
-                item.innerHTML = `
-                    <div class="answer-left">
-                        <span class="answer-number">${index + 1}.</span>
-                        <span class="answer-text">${word.text}</span>
-                    </div>
-                    <span class="answer-meaning">${word.meaning}</span>
-                `;
-                list.appendChild(item);
-            });
-        }
+const TEXTBOOK_DATA = {
+    "PU3": {
+        gradeLabel: "Power Up 3",
+        units: [
+            { name:"Unit 1 词汇1 - Meal Times", words:[
+                {w:"in Russia",cn:"在俄罗斯"},{w:"talk about meals",cn:"谈论食物"},
+                {w:"meal times",cn:"用餐时间"},{w:"half past twelve",cn:"12点半"},
+                {w:"seven o'clock",cn:"7点钟"},{w:"midnight",cn:"午夜"},
+                {w:"half past six",cn:"6点半"},{w:"half past eight",cn:"8点半"},
+                {w:"eight o'clock",cn:"8点钟"},{w:"half past nine",cn:"9点半"},
+                {w:"midday",cn:"正午"},{w:"What time is it?",cn:"现在几点?"},
+                {w:"It's half past twelve.",cn:"现在是12点半。"},
+                {w:"breakfast",cn:"早餐"},{w:"a snack",cn:"一顿小吃"},
+                {w:"lunch",cn:"午餐"},{w:"dinner",cn:"晚餐"},
+                {w:"wake up",cn:"起床"},{w:"go to bed",cn:"去睡觉"}
+            ]},
+            { name:"Unit 1 词汇2 - Action Verbs", words:[
+                {w:"catch",cn:"抓住"},{w:"hop",cn:"单脚跳"},{w:"skip",cn:"跳绳"},{w:"dance",cn:"跳舞"},
+                {w:"jump to your places",cn:"跳到你的位置"},{w:"practice time",cn:"练习时间"},
+                {w:"Are you in or out?",cn:"你是加入还是退出?"},{w:"be quiet",cn:"保持安静"},
+                {w:"mustn't shout",cn:"禁止大叫"},{w:"don't laugh",cn:"不要笑"},
+                {w:"with a smile on your face",cn:"面带微笑"},{w:"hold her legs",cn:"抓住她的腿"},
+                {w:"fall into the net",cn:"落入网中"},{w:"dress up",cn:"打扮"},
+                {w:"jump",cn:"跳"},{w:"climb",cn:"攀登"}
+            ]},
+            { name:"Unit 2 词汇1 - Food & Drinks", words:[
+                {w:"in China",cn:"在中国"},{w:"shop for food",cn:"买食物"},
+                {w:"tea",cn:"茶"},{w:"cup",cn:"杯"},{w:"coffee",cn:"咖啡"},
+                {w:"milkshake",cn:"奶昔"},{w:"glass",cn:"杯"},{w:"cereal",cn:"谷物食物"},
+                {w:"sauce",cn:"酱"},{w:"pancake",cn:"薄煎饼"},{w:"noodles",cn:"面条"},
+                {w:"strawberries",cn:"草莓"},{w:"yogurt",cn:"酸奶"},
+                {w:"a glass of milkshake",cn:"一杯奶昔"},{w:"a cup of coffee",cn:"一杯咖啡"},
+                {w:"a bottle of chocolate sauce",cn:"一瓶巧克力酱"},
+                {w:"a bowl of cereal",cn:"一碗谷物食物"}
+            ]},
+            { name:"Unit 2 词汇2 - Past Tense Verbs", words:[
+                {w:"drove (drive) to town",cn:"开车去城镇"},
+                {w:"the place where May grew (grow) up",cn:"May 长大的地方"},
+                {w:"the teacher who taught (teach) her",cn:"教过她的老师"},
+                {w:"got (get) dressed up",cn:"穿衣打扮"},
+                {w:"took (take) some photos",cn:"拍一些照片"},
+                {w:"gave (give)",cn:"给"},{w:"climbed (climb)",cn:"攀登"},
+                {w:"wrote (write) this song",cn:"写这首歌"}
+            ]},
+            { name:"Unit 3 词汇1 - Body Parts", words:[
+                {w:"do exercise",cn:"做训练"},{w:"on the beach",cn:"在海滩上"},
+                {w:"bandage",cn:"绷带"},{w:"knee",cn:"膝盖"},{w:"stomach",cn:"胃"},
+                {w:"shoulder",cn:"肩膀"},{w:"neck",cn:"脖子"},{w:"toe",cn:"脚趾"},
+                {w:"finger",cn:"手指"},{w:"elbow",cn:"肘部"},{w:"back",cn:"背部"}
+            ]},
+            { name:"Unit 3 词汇2 - Illness & Health", words:[
+                {w:"is/am/are sick",cn:"生病了"},{w:"is/am/are ill",cn:"不舒服"},
+                {w:"be quick",cn:"快点"},{w:"What's the problem?",cn:"什么问题?"},
+                {w:"What's the matter?",cn:"怎么了?"},
+                {w:"have/has got a cough",cn:"咳嗽"},{w:"have/has got a temperature",cn:"发烧"},
+                {w:"have/has got sore throat",cn:"喉咙痛"},{w:"have/has got a cold",cn:"感冒"},
+                {w:"have/has got a backache",cn:"背痛"},{w:"My stomach hurts.",cn:"我的胃痛。"}
+            ]},
+            { name:"Unit 4 词汇1 - Nature", words:[
+                {w:"in India",cn:"在印度"},{w:"star",cn:"星星"},{w:"jungle",cn:"丛林"},
+                {w:"world",cn:"世界"},{w:"waterfall",cn:"瀑布"},{w:"moon",cn:"月亮"},
+                {w:"sky",cn:"天空"},{w:"plant",cn:"植物"},{w:"wave",cn:"海浪"},{w:"island",cn:"岛"}
+            ]},
+            { name:"Unit 4 词汇2 - Past Tense Actions", words:[
+                {w:"drove (drive) to the beach",cn:"开车去海滩"},
+                {w:"sailed (sail) on the sea",cn:"在海上航行"},
+                {w:"threw (throw) our nets",cn:"扔我们的网"},
+                {w:"caught (catch) some fish",cn:"抓些鱼"},
+                {w:"bounced (bounce)",cn:"弹跳"},{w:"hopped (hop)",cn:"单脚跳行"},
+                {w:"skipped (skip)",cn:"跳绳"},{w:"kicked (kick)",cn:"踢"}
+            ]},
+            { name:"Unit 5 词汇1 - Colours & Patterns", words:[
+                {w:"in Greece",cn:"在希腊"},{w:"wing",cn:"翅膀"},{w:"striped",cn:"有条纹的"},
+                {w:"spotted",cn:"有斑点的"},{w:"silver",cn:"银色的"},{w:"bright",cn:"明亮的"},
+                {w:"gold",cn:"金色的"},{w:"light",cn:"淡色的"},{w:"dark",cn:"暗色的"}
+            ]},
+            { name:"Unit 5 词汇2 - Materials", words:[
+                {w:"plastic",cn:"塑料"},{w:"wool",cn:"羊毛"},{w:"wood",cn:"木材"},
+                {w:"cut them up",cn:"把他们剪碎"},{w:"cut them out",cn:"切出来"},{w:"glue",cn:"胶水"},
+                {w:"These scissors are made of metal.",cn:"这剪刀是金属做的。"},
+                {w:"This scarf is made of wool.",cn:"这条围巾是羊毛做的。"},
+                {w:"My box is made of plastic.",cn:"我的盒子是塑料做的。"},
+                {w:"My table's made of wood.",cn:"我的桌子是木头做的。"},
+                {w:"That crown is made of brown card.",cn:"王冠是用棕色卡片做的。"},
+                {w:"silver wings",cn:"银色的翅膀"}
+            ]},
+            { name:"Unit 6 词汇1 - School Subjects", words:[
+                {w:"in Turkey",cn:"在土耳其"},{w:"geography",cn:"地理"},{w:"history",cn:"历史"},
+                {w:"sports",cn:"运动"},{w:"maths",cn:"数学"},{w:"language",cn:"语言"},
+                {w:"music",cn:"音乐"},{w:"science",cn:"科学"},{w:"IT",cn:"信息技术"},{w:"art",cn:"美术"}
+            ]},
+            { name:"Unit 6 词汇2 - Technology", words:[
+                {w:"laptop",cn:"笔记本电脑"},{w:"apps",cn:"应用软件"},{w:"an e-book",cn:"一本电子书"},
+                {w:"a special rucksack",cn:"一个特殊的帆布背包"},
+                {w:"an online dictionary",cn:"一本在线词典"},{w:"bin",cn:"箱子"},
+                {w:"Internet",cn:"互联网"},{w:"find safe websites",cn:"查找安全网站"},
+                {w:"paste a photo or two",cn:"粘贴两张照片"},
+                {w:"scissors",cn:"剪刀"},{w:"glue",cn:"胶"}
+            ]},
+            { name:"Unit 7 词汇1 - Jobs", words:[
+                {w:"in Spain",cn:"在西班牙"},{w:"actor",cn:"演员"},{w:"waiter",cn:"服务员"},
+                {w:"cook",cn:"厨师"},{w:"driver",cn:"驾驶员"},{w:"journalist",cn:"记者"},
+                {w:"photographer",cn:"摄影师"},{w:"artist",cn:"艺术家"},{w:"designer",cn:"设计师"},
+                {w:"singer",cn:"歌手"},{w:"acrobat",cn:"杂技演员"}
+            ]},
+            { name:"Unit 7 词汇2 - Personality", words:[
+                {w:"What's he like?",cn:"他是什么样子的?"},{w:"interesting",cn:"有趣的"},
+                {w:"kind",cn:"友善的"},{w:"friendly",cn:"友好的"},{w:"clever",cn:"聪明的"},
+                {w:"lazy",cn:"懒惰的"},{w:"lovely",cn:"可爱的"},{w:"unkind",cn:"不友善"},
+                {w:"unfriendly",cn:"不友好"},{w:"popular",cn:"受欢迎"},{w:"brave",cn:"勇敢的"}
+            ]},
+            { name:"Unit 8 词汇1 - Directions", words:[
+                {w:"city break",cn:"城市休息"},{w:"in the USA",cn:"在美国"},
+                {w:"They're lost.",cn:"他们迷路了"},{w:"north",cn:"北"},{w:"east",cn:"东"},
+                {w:"south",cn:"南"},{w:"west",cn:"西"},{w:"left",cn:"左"},{w:"right",cn:"右"},
+                {w:"straight on",cn:"一直向前"},{w:"on road 95",cn:"在95号公路上"},
+                {w:"get to road 9",cn:"到达9号公路"}
+            ]},
+            { name:"Unit 8 词汇2 - Buildings in Town", words:[
+                {w:"airport",cn:"机场"},{w:"buildings",cn:"建筑物"},{w:"banks",cn:"银行"},
+                {w:"money",cn:"钱"},{w:"post office",cn:"邮局"},{w:"buy some stamps",cn:"买一些邮票"},
+                {w:"chemist",cn:"化学家"},{w:"theatre",cn:"剧院"},
+                {w:"visit a museum",cn:"参观一个博物馆"},{w:"near the university",cn:"靠近大学"},
+                {w:"a brilliant hotel",cn:"一家非常棒的酒店"},{w:"restaurant",cn:"餐厅"}
+            ]},
+            { name:"Unit 9 词汇1 - Adjectives", words:[
+                {w:"What's the hero called?",cn:"英雄叫什么名字?"},{w:"in Mexico",cn:"在墨西哥"},
+                {w:"noisy",cn:"吵的"},{w:"huge",cn:"巨大的"},{w:"alone",cn:"独自一人的"},
+                {w:"strange",cn:"奇怪"},{w:"horrible",cn:"可怕"},{w:"little",cn:"小的"},
+                {w:"lucky",cn:"幸运"},{w:"excellent",cn:"优秀"},{w:"special",cn:"特别"}
+            ]},
+            { name:"Unit 9 词汇2 - Packing & Travel", words:[
+                {w:"This year's tour is over.",cn:"今年的巡演结束了。"},
+                {w:"pack all your boxes",cn:"打包你的所有盒子"},
+                {w:"the enormous tent",cn:"巨大的帐篷"},{w:"find my pyjamas",cn:"找到我的睡衣"},
+                {w:"pack my trainers",cn:"打包我的运动鞋"},{w:"pack my suitcase",cn:"收拾我的手提箱"},
+                {w:"rucksack",cn:"帆布背包"},{w:"make sandcastles by the sea",cn:"在海边制作沙堡"},
+                {w:"postcard",cn:"明信片"},{w:"views of Mexico",cn:"墨西哥风景"},
+                {w:"stamp",cn:"邮票"},{w:"the post office",cn:"邮局"}
+            ]}
+        ]
+    }
+};
 
-        function resetUI() {
-            document.getElementById('answers').style.display = 'none';
-            document.getElementById('previewArea').style.display = 'block';
-            document.getElementById('starting').style.display = 'flex';
-            document.getElementById('starting').textContent = '准备就绪，点击开始';
-            document.getElementById('currentWord').style.display = 'none';
-            document.getElementById('startBtn').style.display = 'inline-block';
-            document.getElementById('pauseBtn').style.display = 'none';
-            document.getElementById('resumeBtn').style.display = 'none';
-            document.getElementById('restartBtn').style.display = 'none';
-            document.getElementById('daySelect').disabled = false;
-            document.getElementById('speechRate').disabled = false;
-            document.getElementById('repeatCount').disabled = false;
-            document.getElementById('waitTime').disabled = false;
-        }
+// ===== 状态 =====
+let currentUser=null,userData={};
+let sessionWords=[],sessionIndex=0,isRunning=false,isPaused=false,isReviewMode=false;
+let wrongInSession=[],sessionUnitKey="";
+const synth=window.speechSynthesis||null;
+let currentUtterance=null,usVoice=null;
 
-        function unlockAudio() {
-            const u = new SpeechSynthesisUtterance("");
-            window.speechSynthesis.speak(u);
-        }
+function loadVoices(){
+    if(!synth)return;
+    try{
+        const v=synth.getVoices();
+        usVoice=v.find(x=>x.lang==='en-US'&&x.name.toLowerCase().includes('google'))||
+                v.find(x=>x.lang==='en-US'&&x.name.includes('Samantha'))||
+                v.find(x=>x.lang==='en-US'&&x.name.includes('Zira'))||
+                v.find(x=>x.lang==='en-US')||v.find(x=>x.lang.startsWith('en'));
+    }catch(e){}
+}
+try{loadVoices();}catch(e){}
+try{if(synth&&synth.onvoiceschanged!==undefined)synth.onvoiceschanged=loadVoices;}catch(e){}
 
-        async function startDictation() {
-            if (!('speechSynthesis' in window)) {
-                alert("您的浏览器不支持语音朗读功能，请使用 Chrome/Edge/Safari 等现代浏览器。");
-                return;
-            }
+function saveData(){try{localStorage.setItem('pu3_userData',JSON.stringify(userData));}catch(e){}}
+function loadAllData(){try{userData=JSON.parse(localStorage.getItem('pu3_userData')||'{}');}catch(e){userData={};}}
+function ensureUser(uid){
+    if(!userData[uid]){userData[uid]={name:'',joinDate:todayStr(),lastDictDate:'',streak:0,masteredWords:{},errorWords:{},sessionHistory:[]};}
+    return userData[uid];
+}
+function getUserData(){return ensureUser(currentUser.id);}
+function todayStr(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
-            unlockAudio();
+function openScreen(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0,0);
+    if(id==='screen-login'){document.getElementById('login-id').value='';document.getElementById('login-error').style.display='none';initLoginScreen();}
+    if(id==='screen-home')renderHome();
+    if(id==='screen-mastered')renderMastered();
+    if(id==='screen-errors')renderErrors();
+}
 
-            isRunning = true;
-            currentIndex = 0;
-            document.getElementById('daySelect').disabled = true;
-            document.getElementById('speechRate').disabled = true;
-            document.getElementById('repeatCount').disabled = true;
-            document.getElementById('waitTime').disabled = true;
-            document.getElementById('startBtn').style.display = 'none';
-            document.getElementById('pauseBtn').style.display = 'inline-block';
-            document.getElementById('pauseBtn').disabled = false;
-            document.getElementById('restartBtn').style.display = 'none';
-            document.getElementById('answers').style.display = 'none';
-            document.getElementById('previewArea').style.display = 'none';
+function initLoginScreen(){
+    loadAllData();
+    const chips=document.getElementById('user-chips');
+    const box=document.getElementById('existing-users-box');
+    const users=Object.entries(userData).filter(([k])=>k!=='__meta');
+    if(users.length>0){
+        box.style.display='block';
+        chips.innerHTML=users.map(([id,u])=>`<span class="user-chip" onclick="quickLogin('${id}')">👤 ${u.name||id}</span>`).join('');
+    }else{box.style.display='none';}
+}
+function quickLogin(uid){const u=userData[uid];if(!u)return;currentUser={id:uid,name:u.name||uid};afterLogin();}
+function doLogin(){
+    try{
+        var id=document.getElementById('login-id').value.trim().toUpperCase();
+        if(!id){document.getElementById('login-error').textContent='请输入学号';document.getElementById('login-error').style.display='block';return;}
+        try{userData=JSON.parse(localStorage.getItem('pu3_userData')||'{}');}catch(e){userData={};}
+        if(!userData[id]){userData[id]={name:id,joinDate:todayStr(),lastDictDate:'',streak:0,masteredWords:{},errorWords:{},sessionHistory:[]};try{localStorage.setItem('pu3_userData',JSON.stringify(userData));}catch(e){}}
+        currentUser={id:id,name:userData[id].name||id};
+        document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+        document.getElementById('screen-home').classList.add('active');
+        window.scrollTo(0,0);renderHome();
+    }catch(err){document.getElementById('login-error').textContent='出错了：'+err.message;document.getElementById('login-error').style.display='block';}
+}
+function afterLogin(){saveData();openScreen('screen-home');}
 
-            const startingEl = document.getElementById('starting');
-            startingEl.style.display = 'flex';
-            
-            for (let i = 3; i > 0; i--) {
-                startingEl.textContent = `听写将在 ${i} 秒后开始...`;
-                await sleep(1000);
-            }
-            startingEl.style.display = 'none';
-            document.getElementById('currentWord').style.display = 'flex';
+function renderHome(){
+    const ud=getUserData();
+    const mc=Object.values(ud.masteredWords).filter(v=>v.mastered).length;
+    const ec=Object.keys(ud.errorWords).length;
+    document.getElementById('stat-streak').textContent=ud.streak;
+    document.getElementById('stat-mastered').textContent=mc;
+    document.getElementById('stat-error').textContent=ec;
+    document.getElementById('greeting-name').textContent=`Hi，${ud.name||currentUser.name}！👋`;
+    document.getElementById('greeting-sub').textContent=ud.streak>1?`已坚持 ${ud.streak} 天，继续加油！`:'今天也要加油哦！';
+    document.getElementById('review-alert').style.display=ec>=10?'block':'none';
+    const rqBtn=document.getElementById('review-quick-btn');
+    if(ec>0){rqBtn.style.display='flex';document.getElementById('review-quick-count').textContent=`${ec}个待练`;}
+    else{rqBtn.style.display='none';}
+    if(document.getElementById('sel-grade').options.length===0){initSelectors();}else{updatePreview();}
+}
+function updateStreak(ud){
+    const today=todayStr();
+    if(ud.lastDictDate===today)return;
+    const y=new Date();y.setDate(y.getDate()-1);
+    const yStr=`${y.getFullYear()}-${String(y.getMonth()+1).padStart(2,'0')}-${String(y.getDate()).padStart(2,'0')}`;
+    ud.streak=ud.lastDictDate===yStr?(ud.streak||0)+1:1;
+    ud.lastDictDate=today;
+}
+function initSelectors(){
+    const g=document.getElementById('sel-grade');g.innerHTML='';
+    Object.keys(TEXTBOOK_DATA).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=TEXTBOOK_DATA[k].gradeLabel;g.appendChild(o);});
+    onGradeChange();
+}
+function onGradeChange(){
+    const grade=document.getElementById('sel-grade').value;
+    const u=document.getElementById('sel-unit');u.innerHTML='';
+    TEXTBOOK_DATA[grade].units.forEach((x,i)=>{const o=document.createElement('option');o.value=i;o.textContent=x.name;u.appendChild(o);});
+    updatePreview();
+}
+function onUnitChange(){updatePreview();}
+function updatePreview(){
+    const grade=document.getElementById('sel-grade').value;
+    const ui=parseInt(document.getElementById('sel-unit').value);
+    const words=TEXTBOOK_DATA[grade]?.units[ui]?.words||[];
+    document.getElementById('preview-grid').innerHTML=words.map((item,i)=>{
+        const w=typeof item==='object'?item.w:item;
+        const cn=typeof item==='object'?item.cn:'';
+        return `<div class="preview-item"><span class="num">${i+1}</span><div class="word">${w}</div>${cn?`<div class="cn">${cn}</div>`:''}</div>`;
+    }).join('');
+}
 
-            for (let i = 0; i < currentDayWords.length; i++) {
-                currentIndex = i;
-                updateProgress();
-                await dictateItem(i);
-                
-                while (isPaused) {
-                    await sleep(100);
-                }
-            }
+function unlockAudio(){
+    if(!synth)return;
+    try{const u=new SpeechSynthesisUtterance('');synth.speak(u);synth.cancel();}catch(e){}
+    if(!usVoice){try{const v=synth.getVoices();usVoice=v.find(x=>x.lang==='en-US')||v.find(x=>x.lang.startsWith('en'))||v[0]||null;}catch(e){}}
+}
+function startDictation(){
+    unlockAudio();
+    const grade=document.getElementById('sel-grade').value;
+    const ui=parseInt(document.getElementById('sel-unit').value);
+    const unit=TEXTBOOK_DATA[grade].units[ui];
+    const orderMode=document.getElementById('set-order').value;
+    isReviewMode=false;
+    let words=unit.words.map(item=>typeof item==='object'?item:{w:item,cn:''});
+    if(orderMode==='random'){words=[...words];for(let i=words.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[words[i],words[j]]=[words[j],words[i]];}}
+    sessionWords=words;sessionUnitKey=`${grade}__${ui}`;
+    document.getElementById('run-unit-name').textContent=unit.name+(orderMode==='random'?' 🔀':'');
+    openScreen('screen-running');runDictation();
+}
+function startReviewDictation(){
+    unlockAudio();
+    const ud=getUserData();
+    const errWords=Object.keys(ud.errorWords);
+    if(errWords.length===0){alert('错题本是空的！');return;}
+    isReviewMode=true;
+    const allWords={};
+    Object.values(TEXTBOOK_DATA).forEach(g=>g.units.forEach(u=>u.words.forEach(item=>{const w=typeof item==='object'?item.w:item;const cn=typeof item==='object'?item.cn:'';allWords[w]=cn;})));
+    sessionWords=errWords.map(w=>({w,cn:allWords[w]||''}));
+    sessionUnitKey='__review__';
+    document.getElementById('run-unit-name').textContent='🔁 错词复习';
+    openScreen('screen-running');runDictation();
+}
 
-            finishDictation();
-        }
+async function runDictation(){
+    isRunning=true;isPaused=false;sessionIndex=0;wrongInSession=[];
+    const wordEl=document.getElementById('run-word');
+    const statusEl=document.getElementById('run-status');
+    const ordinalEl=document.getElementById('run-ordinal');
+    const total=sessionWords.length;
+    if(synth){synth.cancel();const w=new SpeechSynthesisUtterance('');synth.speak(w);}
+    statusEl.textContent='准备开始...';
+    for(let i=3;i>0;i--){wordEl.textContent=i;await sleep(900);}
+    wordEl.textContent='';
+    while(sessionIndex<total&&isRunning){
+        updateRunProgress();
+        await waitWhilePaused();
+        if(!isRunning)break;
+        const word=sessionWords[sessionIndex];
+        const wordText=typeof word==='object'?word.w:word;
+        ordinalEl.textContent=`第 ${sessionIndex+1} 个 / 共 ${total} 个`;
+        wordEl.style.animation='none';wordEl.offsetHeight;wordEl.style.animation='popIn 0.35s both';
+        wordEl.textContent=`#${sessionIndex+1}`;wordEl.style.color='#6b7280';
+        statusEl.textContent='🔊 朗读中...';
+        const repeat=parseInt(document.getElementById('set-repeat').value);
+        for(let r=0;r<repeat;r++){await waitWhilePaused();if(!isRunning)break;await speakWord(wordText);if(r<repeat-1)await sleep(1000);}
+        if(!isRunning)break;
+        wordEl.style.color='#e0e7ff';statusEl.textContent='✍️ 书写中...';
+        await runCountdown(parseInt(document.getElementById('set-wait').value));
+        sessionIndex++;
+    }
+    if(isRunning)showResult();
+}
+async function runCountdown(seconds){
+    const wrap=document.getElementById('countdown-wrap');
+    const arcEl=document.getElementById('countdown-arc');
+    const numEl=document.getElementById('countdown-num');
+    const total_ms=seconds*1000;const R=22,C=2*Math.PI*R;
+    wrap.style.display='block';arcEl.style.strokeDasharray=C;arcEl.style.strokeDashoffset=0;
+    const start=Date.now();
+    while(true){
+        if(!isRunning)break;await waitWhilePaused();
+        const elapsed=Date.now()-start;const remain=Math.max(0,total_ms-elapsed);
+        arcEl.style.strokeDashoffset=C*(1-remain/total_ms);numEl.textContent=Math.ceil(remain/1000);
+        if(remain<=0)break;await sleep(80);
+    }
+    wrap.style.display='none';
+}
+function updateRunProgress(){
+    const total=sessionWords.length,pct=(sessionIndex/total)*100;
+    document.getElementById('run-progress-fill').style.width=pct+'%';
+    document.getElementById('run-progress-text').textContent=`${sessionIndex} / ${total}`;
+}
+async function waitWhilePaused(){while(isPaused&&isRunning)await sleep(200);}
+function togglePause(){
+    isPaused=!isPaused;
+    const btn=document.getElementById('pause-btn');
+    if(isPaused){if(synth)synth.cancel();btn.textContent='▶ 继续';document.getElementById('run-status').textContent='⏸ 已暂停';}
+    else{btn.textContent='⏸ 暂停';}
+}
+function stopDictation(){
+    if(confirm('确定要提前结束吗？')){isRunning=false;if(synth)synth.cancel();openScreen('screen-home');}
+}
+function speakWord(text){
+    return new Promise(resolve=>{
+        if(!synth){setTimeout(resolve,800);return;}
+        if(!usVoice){try{const v=synth.getVoices();usVoice=v.find(x=>x.lang==='en-US')||v.find(x=>x.lang.startsWith('en'))||v[0]||null;}catch(e){}}
+        synth.cancel();
+        const u=new SpeechSynthesisUtterance(text);
+        u.lang='en-US';u.rate=parseFloat(document.getElementById('set-rate').value);u.pitch=1.0;
+        if(usVoice)u.voice=usVoice;
+        currentUtterance=u;
+        u.onend=()=>{currentUtterance=null;resolve();};
+        u.onerror=()=>{currentUtterance=null;resolve();};
+        synth.speak(u);
+        const timeout=Math.max(5000,text.length*600);
+        setTimeout(()=>{if(currentUtterance===u){currentUtterance=null;resolve();}},timeout);
+    });
+}
 
-        async function dictateItem(index) {
-            const word = currentDayWords[index];
-            const displayEl = document.getElementById('currentWord');
-            
-            const repeatCount = parseInt(document.getElementById('repeatCount').value);
-            const waitTime = parseInt(document.getElementById('waitTime').value);
+function showResult(){
+    openScreen('screen-result');isRunning=false;
+    document.getElementById('answer-check-grid').innerHTML=sessionWords.map((item,i)=>{
+        const w=typeof item==='object'?item.w:item;
+        const cn=typeof item==='object'?item.cn:'';
+        return `<div class="answer-check-item" id="aci-${i}"><span class="num">${i+1}</span><div class="word">${w}</div>${cn?`<div class="cn">${cn}</div>`:''}<div class="check-box" id="cb-${i}" onclick="toggleWrong(${i})"></div></div>`;
+    }).join('');
+    updateResultSummary();
+    const ud=getUserData();
+    document.getElementById('result-streak').textContent=`🔥 今天是你坚持的第 ${ud.streak} 天`;
+    refreshEncourage(0,sessionWords.length);
+}
+function toggleWrong(idx){
+    const item=document.getElementById(`aci-${idx}`);
+    const cb=document.getElementById(`cb-${idx}`);
+    const word=typeof sessionWords[idx]==='object'?sessionWords[idx].w:sessionWords[idx];
+    const isNowWrong=!item.classList.contains('wrong');
+    item.classList.toggle('wrong',isNowWrong);cb.classList.toggle('checked',isNowWrong);cb.textContent=isNowWrong?'✗':'';
+    if(isNowWrong){if(!wrongInSession.includes(word))wrongInSession.push(word);}
+    else{wrongInSession=wrongInSession.filter(w=>w!==word);}
+    updateResultSummary();
+}
+function updateResultSummary(){
+    const wrong=wrongInSession.length,correct=sessionWords.length-wrong;
+    const score=Math.round((correct/sessionWords.length)*100);
+    document.getElementById('result-score').textContent=score+'分';
+    document.getElementById('sum-correct').textContent=`✅ ${correct} 个全对`;
+    document.getElementById('sum-wrong').textContent=`❌ ${wrong} 个错误`;
+    document.getElementById('result-star').textContent=score>=90?'🌟':score>=70?'🎉':'💪';
+    refreshEncourage(wrong,sessionWords.length);
+}
+function refreshEncourage(wrong,total){
+    const ud=getUserData();
+    let msg=wrong===0?`太棒了！全部正确！你是单词大师！🏆`:
+            wrong<=2?`非常好！只错了 ${wrong} 个，继续加油！😊`:
+            wrong<=total*0.3?`不错哦！已经坚持了 ${ud.streak} 天，为你点赞！⭐`:
+            `没关系，多练几次就记住啦！坚持就是胜利！💪`;
+    document.getElementById('result-encourage').textContent=msg;
+}
+function submitResult(){
+    const ud=getUserData();
+    wrongInSession.forEach(w=>{ud.errorWords[w]=(ud.errorWords[w]||0)+1;if(ud.masteredWords[w])delete ud.masteredWords[w];});
+    sessionWords.forEach(item=>{
+        const w=typeof item==='object'?item.w:item;
+        if(wrongInSession.includes(w))return;
+        if(!ud.masteredWords[w])ud.masteredWords[w]={correctStreak:0};
+        ud.masteredWords[w].correctStreak=(ud.masteredWords[w].correctStreak||0)+1;
+        if(ud.masteredWords[w].correctStreak>=2){ud.masteredWords[w].mastered=true;delete ud.errorWords[w];}
+    });
+    updateStreak(ud);saveData();openScreen('screen-home');
+}
 
-            displayEl.textContent = `单词 ${index + 1}`;
-            displayEl.style.color = "#2d3748";
+function buildCnMap(){
+    const map={};
+    Object.values(TEXTBOOK_DATA).forEach(g=>g.units.forEach(u=>u.words.forEach(item=>{if(typeof item==='object')map[item.w]=item.cn;})));
+    return map;
+}
+function renderMastered(){
+    const ud=getUserData();
+    const mastered=Object.entries(ud.masteredWords).filter(([,v])=>v&&v.mastered);
+    const el=document.getElementById('mastered-content');
+    if(mastered.length===0){el.innerHTML='<div class="empty-tip">还没有掌握的单词，加油听写！🌱</div>';return;}
+    const cnMap=buildCnMap();
+    el.innerHTML=`<div style="color:var(--sub);font-size:0.8rem;margin-bottom:8px;">共掌握 ${mastered.length} 个单词 🎉</div><div class="word-list-grid">`+
+        mastered.map(([w])=>`<div class="word-card"><div class="w">${w}</div>${cnMap[w]?`<div class="wc">${cnMap[w]}</div>`:''}<div class="cnt">已掌握 ⭐</div></div>`).join('')+`</div>`;
+}
+function renderErrors(){
+    const ud=getUserData();
+    const errors=Object.entries(ud.errorWords);
+    const el=document.getElementById('errors-content');
+    const btn=document.getElementById('error-review-btn');
+    const cnMap=buildCnMap();
+    if(errors.length===0){el.innerHTML='<div class="empty-tip">错题本是空的，你太厉害了！🌟</div>';btn.style.display='none';return;}
+    btn.style.display='block';
+    el.innerHTML=`<div style="color:var(--sub);font-size:0.8rem;margin-bottom:8px;">共 ${errors.length} 个错词，别忘了复习哦！</div><div class="word-list-grid">`+
+        errors.sort((a,b)=>b[1]-a[1]).map(([w,cnt])=>`<div class="word-card"><div class="w">${w}</div>${cnMap[w]?`<div class="wc">${cnMap[w]}</div>`:''}<div class="cnt">错了 ${cnt} 次</div></div>`).join('')+`</div>`;
+}
 
-            for (let r = 0; r < repeatCount; r++) {
-                if (isPaused) return;
-                
-                await speak(word.text);
-                
-                if (r < repeatCount - 1) {
-                    await sleep(1500);
-                }
-            }
-
-            displayEl.style.color = "#718096";
-            for (let t = waitTime; t > 0; t--) {
-                if (isPaused) return;
-                displayEl.textContent = `等待 ${t} 秒...`;
-                await sleep(1000);
-            }
-        }
-
-        function speak(text) {
-            return new Promise((resolve) => {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-US';
-                const selectedRate = document.getElementById('speechRate').value;
-                utterance.rate = parseFloat(selectedRate);
-                
-                utterance.onend = () => {
-                    resolve();
-                };
-                
-                utterance.onerror = (e) => {
-                    console.error("Speech error:", e);
-                    resolve();
-                };
-
-                window.speechSynthesis.speak(utterance);
-            });
-        }
-
-        function updateProgress() {
-            const total = currentDayWords.length;
-            const current = currentIndex + 1;
-            const percentage = Math.round((current / total) * 100);
-            
-            document.getElementById('currentProgress').textContent = `${current} / ${total}`;
-            const bar = document.getElementById('progressBar');
-            bar.style.width = `${percentage}%`;
-            bar.textContent = `${percentage}%`;
-        }
-
-        function pauseDictation() {
-            isPaused = true;
-            window.speechSynthesis.cancel();
-            document.getElementById('pauseBtn').style.display = 'none';
-            document.getElementById('resumeBtn').style.display = 'inline-block';
-            document.getElementById('currentWord').textContent = "已暂停";
-        }
-
-        function resumeDictation() {
-            isPaused = false;
-            document.getElementById('resumeBtn').style.display = 'none';
-            document.getElementById('pauseBtn').style.display = 'inline-block';
-        }
-
-        function resetDictation() {
-            window.speechSynthesis.cancel();
-            isRunning = false;
-            isPaused = false;
-            resetUI();
-            loadDay();
-        }
-
-        function finishDictation() {
-            isRunning = false;
-            document.getElementById('currentWord').textContent = "听写完成！";
-            document.getElementById('pauseBtn').style.display = 'none';
-            document.getElementById('restartBtn').style.display = 'inline-block';
-            document.getElementById('daySelect').disabled = false;
-            document.getElementById('speechRate').disabled = false;
-            document.getElementById('repeatCount').disabled = false;
-            document.getElementById('waitTime').disabled = false;
-            document.getElementById('previewArea').style.display = 'none';
-            
-            showAnswers();
-        }
-
-        function showAnswers() {
-            const list = document.getElementById('answerList');
-            list.innerHTML = '';
-            
-            currentDayWords.forEach((word, index) => {
-                const item = document.createElement('div');
-                item.className = 'answer-item';
-                item.innerHTML = `
-                    <div class="answer-left">
-                        <span class="answer-number">${index + 1}.</span>
-                        <span class="answer-text">${word.text}</span>
-                    </div>
-                    <span class="answer-meaning">${word.meaning}</span>
-                `;
-                list.appendChild(item);
-            });
-
-            document.getElementById('answers').style.display = 'block';
-            document.getElementById('answers').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-    </script>
+(function init(){
+    try{var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);if(isIOS)document.getElementById('iosTip').style.display='block';}catch(e){}
+    initLoginScreen();
+})();
+</script>
 </body>
 </html>
