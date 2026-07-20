@@ -585,14 +585,15 @@ async function runDictation(){
         if(!isRunning)break;
         const word=sessionWords[sessionIndex];
         const wordText=typeof word==='object'?word.w:word;
+        const wordCn=typeof word==='object'?word.cn:'';
         ordinalEl.textContent=`第 ${sessionIndex+1} 个 / 共 ${total} 个`;
         wordEl.style.animation='none';wordEl.offsetHeight;wordEl.style.animation='popIn 0.35s both';
-        wordEl.textContent=`#${sessionIndex+1}`;wordEl.style.color='#6b7280';
+        wordEl.textContent=wordCn||`#${sessionIndex+1}`;wordEl.style.color=wordCn?'#4338ca':'#6b7280';
         statusEl.textContent='🔊 朗读中...';
         const repeat=parseInt(document.getElementById('set-repeat').value);
         for(let r=0;r<repeat;r++){await waitWhilePaused();if(!isRunning)break;await speakWord(wordText);if(r<repeat-1)await sleep(1000);}
         if(!isRunning)break;
-        wordEl.style.color='#e0e7ff';statusEl.textContent='✍️ 书写中...';
+        wordEl.style.color=wordCn?'#4338ca':'#e0e7ff';statusEl.textContent='✍️ 书写中...';
         await runCountdown(parseInt(document.getElementById('set-wait').value));
         sessionIndex++;
     }
