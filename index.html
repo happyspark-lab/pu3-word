@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Power Up 3 英语单词闯关</title>
     <style>
         :root {
@@ -133,7 +133,11 @@
         @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
         .pop-in{animation:popIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;}
         .shake{animation:shake 0.4s ease both;}
-    </style>
+    
+/* responsive-wide */
+@media (min-width:768px){body{padding:24px}#screen-login{max-width:520px;padding-top:56px}#screen-home,#screen-running,#screen-result,#screen-mastered,#screen-errors{max-width:760px}.card{padding:28px 26px}.preview-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));max-height:430px}.answer-check-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}.word-list-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.big-word{font-size:3rem;min-height:92px}}
+@media (min-width:1100px){#screen-home,#screen-result,#screen-mastered,#screen-errors{max-width:960px}#screen-running{max-width:820px}.preview-grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}.answer-check-grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}.word-list-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}}
+</style>
 </head>
 <body>
 
@@ -428,7 +432,7 @@ const TEXTBOOK_DATA = {
 
 // ===== 状态 =====
 let currentUser=null,userData={};
-let sessionWords=[],sessionIndex=0,isRunning=false,isPaused=false,isReviewMode=false;
+let sessionWords=[],sessionIndex=0,isRunning=false,isPaused=false,isReviewMode=false,speechInterrupted=false;
 let wrongInSession=[],sessionUnitKey="";
 const synth=window.speechSynthesis||null;
 let currentUtterance=null,usVoice=null;
@@ -548,7 +552,7 @@ function startDictation(){
     const ui=parseInt(document.getElementById('sel-unit').value);
     const unit=TEXTBOOK_DATA[grade].units[ui];
     const orderMode=document.getElementById('set-order').value;
-    isReviewMode=false;
+    isReviewMode=false,speechInterrupted=false;
     let words=unit.words.map(item=>typeof item==='object'?item:{w:item,cn:''});
     if(orderMode==='random'){words=[...words];for(let i=words.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[words[i],words[j]]=[words[j],words[i]];}}
     sessionWords=words;sessionUnitKey=`${grade}__${ui}`;
@@ -591,7 +595,7 @@ async function runDictation(){
         wordEl.textContent=wordCn||`#${sessionIndex+1}`;wordEl.style.color=wordCn?'#4338ca':'#6b7280';
         statusEl.textContent='🔊 朗读中...';
         const repeat=parseInt(document.getElementById('set-repeat').value);
-        for(let r=0;r<repeat;r++){await waitWhilePaused();if(!isRunning)break;await speakWord(wordText);if(r<repeat-1)await sleep(1000);}
+        for(let r=0;r<repeat;r++){await waitWhilePaused();if(!isRunning)break;await speakWhileActive(wordText);if(r<repeat-1)await sleep(1000);}
         if(!isRunning)break;
         wordEl.style.color=wordCn?'#4338ca':'#e0e7ff';statusEl.textContent='✍️ 书写中...';
         await runCountdown(parseInt(document.getElementById('set-wait').value));
@@ -605,10 +609,10 @@ async function runCountdown(seconds){
     const numEl=document.getElementById('countdown-num');
     const total_ms=seconds*1000;const R=22,C=2*Math.PI*R;
     wrap.style.display='block';arcEl.style.strokeDasharray=C;arcEl.style.strokeDashoffset=0;
-    const start=Date.now();
+    const start=Date.now();let pausedTotal=0;
     while(true){
-        if(!isRunning)break;await waitWhilePaused();
-        const elapsed=Date.now()-start;const remain=Math.max(0,total_ms-elapsed);
+        if(!isRunning)break;if(isPaused){const pausedAt=Date.now();await waitWhilePaused();pausedTotal+=Date.now()-pausedAt;}
+        const elapsed=Date.now()-start-pausedTotal;const remain=Math.max(0,total_ms-elapsed);
         arcEl.style.strokeDashoffset=C*(1-remain/total_ms);numEl.textContent=Math.ceil(remain/1000);
         if(remain<=0)break;await sleep(80);
     }
@@ -620,10 +624,11 @@ function updateRunProgress(){
     document.getElementById('run-progress-text').textContent=`${sessionIndex} / ${total}`;
 }
 async function waitWhilePaused(){while(isPaused&&isRunning)await sleep(200);}
+async function speakWhileActive(text){do{await waitWhilePaused();if(!isRunning)return;speechInterrupted=false;await speakWord(text);}while(speechInterrupted&&isRunning);}
 function togglePause(){
     isPaused=!isPaused;
     const btn=document.getElementById('pause-btn');
-    if(isPaused){if(synth)synth.cancel();btn.textContent='▶ 继续';document.getElementById('run-status').textContent='⏸ 已暂停';}
+    if(isPaused){speechInterrupted=true;if(currentUtterance&&currentUtterance.onerror)currentUtterance.onerror();if(synth)synth.cancel();btn.textContent='▶ 继续';document.getElementById('run-status').textContent='⏸ 已暂停';}
     else{btn.textContent='⏸ 暂停';}
 }
 function stopDictation(){
