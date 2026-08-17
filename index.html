@@ -95,9 +95,10 @@
         .countdown-ring circle{fill:none;stroke:#e0e7ff;stroke-width:5;}
         .countdown-ring .arc{stroke:#6366f1;stroke-linecap:round;transition:stroke-dashoffset 0.1s linear;}
         .countdown-num{position:relative;top:-42px;text-align:center;font-size:1.1rem;font-weight:900;color:var(--primary-dark);}
-        .run-btns{display:flex;gap:10px;margin-top:6px;}
-        .run-btn{flex:1;padding:11px;border-radius:12px;border:none;font-weight:700;font-size:0.9rem;cursor:pointer;}
+        .run-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:6px;}
+        .run-btn{padding:11px 6px;border-radius:12px;border:none;font-weight:700;font-size:0.9rem;cursor:pointer;}
         .run-btn-pause{background:#e0e7ff;color:#4338ca;}
+        .run-btn-next{background:var(--primary);color:#fff;}
         .run-btn-stop{background:#fee2e2;color:#b91c1c;}
 
         /* RESULT */
@@ -235,8 +236,10 @@
             </div>
         </div>
         <div class="run-btns">
-            <button class="run-btn run-btn-pause" id="pause-btn" onclick="togglePause()">⏸ 暂停</button>
-            <button class="run-btn run-btn-stop" onclick="stopDictation()">⏹ 结束</button>
+            <button class="run-btn run-btn-pause" id="pause-btn" onclick="togglePause()">暂停</button>
+            <button class="run-btn run-btn-pause" onclick="replayCurrentWord()">重听</button>
+            <button class="run-btn run-btn-next" onclick="nextWord()">下一个</button>
+            <button class="run-btn run-btn-stop" onclick="stopDictation()">结束</button>
         </div>
     </div>
 </div>
@@ -432,7 +435,7 @@ const TEXTBOOK_DATA = {
 
 // ===== 状态 =====
 let currentUser=null,userData={};
-let sessionWords=[],sessionIndex=0,isRunning=false,isPaused=false,isReviewMode=false,speechInterrupted=false;
+let sessionWords=[],sessionIndex=0,isRunning=false,isPaused=false,isReviewMode=false,speechInterrupted=false,skipCurrentWord=false;
 let wrongInSession=[],sessionUnitKey="";
 const synth=window.speechSynthesis||null;
 let currentUtterance=null,usVoice=null;
@@ -574,7 +577,7 @@ function startReviewDictation(){
 }
 
 async function runDictation(){
-    isRunning=true;isPaused=false;sessionIndex=0;wrongInSession=[];
+    isRunning=true;isPaused=false;skipCurrentWord=false;document.getElementById('pause-btn').textContent='暂停';sessionIndex=0;wrongInSession=[];
     const wordEl=document.getElementById('run-word');
     const statusEl=document.getElementById('run-status');
     const ordinalEl=document.getElementById('run-ordinal');
@@ -584,6 +587,7 @@ async function runDictation(){
     for(let i=3;i>0;i--){wordEl.textContent=i;await sleep(900);}
     wordEl.textContent='';
     while(sessionIndex<total&&isRunning){
+        skipCurrentWord=false;
         updateRunProgress();
         await waitWhilePaused();
         if(!isRunning)break;
@@ -595,8 +599,9 @@ async function runDictation(){
         wordEl.textContent=wordCn||`#${sessionIndex+1}`;wordEl.style.color=wordCn?'#4338ca':'#6b7280';
         statusEl.textContent='🔊 朗读中...';
         const repeat=parseInt(document.getElementById('set-repeat').value);
-        for(let r=0;r<repeat;r++){await waitWhilePaused();if(!isRunning)break;await speakWhileActive(wordText);if(r<repeat-1)await sleep(1000);}
+        for(let r=0;r<repeat;r++){await waitWhilePaused();if(!isRunning||skipCurrentWord)break;await speakWhileActive(wordText);if(skipCurrentWord)break;if(r<repeat-1)await sleep(1000);}
         if(!isRunning)break;
+        if(skipCurrentWord){sessionIndex++;continue;}
         wordEl.style.color=wordCn?'#4338ca':'#e0e7ff';statusEl.textContent='✍️ 书写中...';
         await runCountdown(parseInt(document.getElementById('set-wait').value));
         sessionIndex++;
@@ -611,7 +616,7 @@ async function runCountdown(seconds){
     wrap.style.display='block';arcEl.style.strokeDasharray=C;arcEl.style.strokeDashoffset=0;
     const start=Date.now();let pausedTotal=0;
     while(true){
-        if(!isRunning)break;if(isPaused){const pausedAt=Date.now();await waitWhilePaused();pausedTotal+=Date.now()-pausedAt;}
+        if(!isRunning||skipCurrentWord)break;if(isPaused){const pausedAt=Date.now();await waitWhilePaused();pausedTotal+=Date.now()-pausedAt;}
         const elapsed=Date.now()-start-pausedTotal;const remain=Math.max(0,total_ms-elapsed);
         arcEl.style.strokeDashoffset=C*(1-remain/total_ms);numEl.textContent=Math.ceil(remain/1000);
         if(remain<=0)break;await sleep(80);
@@ -624,13 +629,15 @@ function updateRunProgress(){
     document.getElementById('run-progress-text').textContent=`${sessionIndex} / ${total}`;
 }
 async function waitWhilePaused(){while(isPaused&&isRunning)await sleep(200);}
-async function speakWhileActive(text){do{await waitWhilePaused();if(!isRunning)return;speechInterrupted=false;await speakWord(text);}while(speechInterrupted&&isRunning);}
+async function speakWhileActive(text){do{await waitWhilePaused();if(!isRunning||skipCurrentWord)return;speechInterrupted=false;await speakWord(text);}while(speechInterrupted&&isRunning&&!skipCurrentWord);}
 function togglePause(){
     isPaused=!isPaused;
     const btn=document.getElementById('pause-btn');
-    if(isPaused){speechInterrupted=true;if(currentUtterance&&currentUtterance.onerror)currentUtterance.onerror();if(synth)synth.cancel();btn.textContent='▶ 继续';document.getElementById('run-status').textContent='⏸ 已暂停';}
-    else{btn.textContent='⏸ 暂停';}
+    if(isPaused){speechInterrupted=true;if(currentUtterance&&currentUtterance.onerror)currentUtterance.onerror();if(synth)synth.cancel();btn.textContent='继续';document.getElementById('run-status').textContent='⏸ 已暂停';}
+    else{btn.textContent='暂停';}
 }
+function replayCurrentWord(){if(!isRunning||sessionIndex>=sessionWords.length)return;const word=sessionWords[sessionIndex];speakWord(typeof word==='object'?word.w:word);}
+function nextWord(){if(!isRunning||sessionIndex>=sessionWords.length)return;skipCurrentWord=true;if(currentUtterance&&currentUtterance.onerror)currentUtterance.onerror();if(synth)synth.cancel();}
 function stopDictation(){
     if(confirm('确定要提前结束吗？')){isRunning=false;if(synth)synth.cancel();openScreen('screen-home');}
 }
