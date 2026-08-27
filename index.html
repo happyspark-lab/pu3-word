@@ -524,15 +524,18 @@ function updateStreak(ud){
 function initSelectors(){
     const g=document.getElementById('sel-grade');g.innerHTML='';
     Object.keys(TEXTBOOK_DATA).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=TEXTBOOK_DATA[k].gradeLabel;g.appendChild(o);});
+    const saved=getUserData().lastSelection;if(saved&&TEXTBOOK_DATA[saved.grade])g.value=saved.grade;
     onGradeChange();
 }
 function onGradeChange(){
     const grade=document.getElementById('sel-grade').value;
     const u=document.getElementById('sel-unit');u.innerHTML='';
     TEXTBOOK_DATA[grade].units.forEach((x,i)=>{const o=document.createElement('option');o.value=i;o.textContent=x.name;u.appendChild(o);});
+    const saved=getUserData().lastSelection;if(saved&&saved.grade===grade&&TEXTBOOK_DATA[grade].units[saved.unit])u.value=saved.unit;saveLastSelection();
     updatePreview();
 }
-function onUnitChange(){updatePreview();}
+function onUnitChange(){saveLastSelection();updatePreview();}
+function saveLastSelection(){if(!currentUser)return;const grade=document.getElementById('sel-grade').value,unit=document.getElementById('sel-unit').value;if(!grade||unit==='')return;getUserData().lastSelection={grade,unit:parseInt(unit)};saveData();}
 function updatePreview(){
     const grade=document.getElementById('sel-grade').value;
     const ui=parseInt(document.getElementById('sel-unit').value);
@@ -551,6 +554,7 @@ function unlockAudio(){
 }
 function startDictation(){
     unlockAudio();
+    saveLastSelection();
     const grade=document.getElementById('sel-grade').value;
     const ui=parseInt(document.getElementById('sel-unit').value);
     const unit=TEXTBOOK_DATA[grade].units[ui];
